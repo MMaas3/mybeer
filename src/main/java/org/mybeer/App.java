@@ -48,7 +48,7 @@ public class App extends Application {
         final FXMLLoader fxmlLoader = new FXMLLoader();
         AnchorPane recipe = fxmlLoader.load(new FileInputStream("src/main/resources/view/recipe.fxml"));
         RecipeController controller = fxmlLoader.getController();
-        controller.setRecipe(selectedItems.get(0));
+        controller.setRecipe(selectedItems.get(0).getId());
         stage.setScene(new Scene(recipe));
       } catch (IOException e) {
         e.printStackTrace();
