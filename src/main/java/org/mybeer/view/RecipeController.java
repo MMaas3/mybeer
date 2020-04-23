@@ -12,13 +12,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
 import javafx.util.converter.BigDecimalStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import org.hibernate.Session;
 import org.mybeer.hibernate.RecipeDao;
 import org.mybeer.hibernate.SessionFactorySingleton;
 import org.mybeer.model.recipe.FermentableAddition;
+import org.mybeer.model.recipe.HopAddition;
 import org.mybeer.model.recipe.Recipe;
 
 import java.math.BigDecimal;
@@ -34,6 +34,8 @@ public class RecipeController {
   private Recipe recipe;
   @FXML
   private TableView<FermentableAddition> fermetablesTable;
+  @FXML
+  private TableView<HopAddition> hopsTable;
 
   public void setRecipe(Long recipeId) {
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
@@ -49,49 +51,95 @@ public class RecipeController {
       volumeField.textProperty()
                  .bindBidirectional(new SimpleObjectProperty<>(this.recipe.getVolume()), new BigDecimalStringConverter());
 
-      fermetablesTable.setItems(FXCollections.observableArrayList(this.recipe.getFermentableAdditions()));
-
-      final TableColumn<FermentableAddition, BigDecimal> amountColumn = new TableColumn<>("Amount");
-      amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-      fermetablesTable.getColumns().add(amountColumn);
-
-
-      final TableColumn<FermentableAddition, String> fermentableColumn = new TableColumn<>("Fermentable");
-      fermentableColumn.setCellValueFactory(
-          param -> {
-            final FermentableAddition addition = param.getValue();
-            return new ObservableValue<>() {
-              @Override
-              public void addListener(ChangeListener<? super String> listener) {
-
-              }
-
-              @Override
-              public void removeListener(ChangeListener<? super String> listener) {
-
-              }
-
-              @Override
-              public String getValue() {
-                return addition.getFermentable().getName();
-              }
-
-              @Override
-              public void addListener(InvalidationListener listener) {
-
-              }
-
-              @Override
-              public void removeListener(InvalidationListener listener) {
-
-              }
-            };
-          });
-      fermetablesTable.getColumns().add(fermentableColumn);
-
-      final TableColumn<FermentableAddition, String> momentColumn = new TableColumn<>("Moment");
-      momentColumn.setCellValueFactory(new PropertyValueFactory<>("additionMoment"));
-      fermetablesTable.getColumns().add(momentColumn);
+      fillFermentablesTable();
+      fillHopsTable();
     }
+  }
+
+  private void fillHopsTable() {
+    hopsTable.setItems(FXCollections.observableArrayList(this.recipe.getHopAdditions()));
+    this.<HopAddition, BigDecimal>addPropertyColumn("Amount", "amount", hopsTable);
+    this.<HopAddition, String>addPropertyColumn("Moment", "additionMoment", hopsTable);
+    final TableColumn<HopAddition, String> hopColumn = new TableColumn<>("Hop");
+    hopColumn.setCellValueFactory(param -> {
+      final HopAddition value = param.getValue();
+      return new ObservableValue<>() {
+        @Override
+        public void addListener(ChangeListener<? super String> listener) {
+
+        }
+
+        @Override
+        public void removeListener(ChangeListener<? super String> listener) {
+
+        }
+
+        @Override
+        public String getValue() {
+          return value.getHop().getName();
+        }
+
+        @Override
+        public void addListener(InvalidationListener listener) {
+
+        }
+
+        @Override
+        public void removeListener(InvalidationListener listener) {
+
+        }
+      };
+    });
+    this.hopsTable.getColumns().add(hopColumn);
+
+    this.<HopAddition, Integer>addPropertyColumn("Contact time", "contactTime", hopsTable);
+
+  }
+
+  private void fillFermentablesTable() {
+    fermetablesTable.setItems(FXCollections.observableArrayList(this.recipe.getFermentableAdditions()));
+
+    this.<FermentableAddition, BigDecimal>addPropertyColumn("Amount", "amount", this.fermetablesTable);
+
+    final TableColumn<FermentableAddition, String> fermentableColumn = new TableColumn<>("Fermentable");
+    fermentableColumn.setCellValueFactory(
+        param -> {
+          final FermentableAddition addition = param.getValue();
+          return new ObservableValue<>() {
+            @Override
+            public void addListener(ChangeListener<? super String> listener) {
+
+            }
+
+            @Override
+            public void removeListener(ChangeListener<? super String> listener) {
+
+            }
+
+            @Override
+            public String getValue() {
+              return addition.getFermentable().getName();
+            }
+
+            @Override
+            public void addListener(InvalidationListener listener) {
+
+            }
+
+            @Override
+            public void removeListener(InvalidationListener listener) {
+
+            }
+          };
+        });
+    fermetablesTable.getColumns().add(fermentableColumn);
+
+    this.<FermentableAddition, String>addPropertyColumn("Moment", "additionMoment", this.fermetablesTable);
+  }
+
+  private <T, U> void addPropertyColumn(String label, String property, TableView<T> table) {
+    final TableColumn<T, U> column = new TableColumn<>(label);
+    column.setCellValueFactory(new PropertyValueFactory<>(property));
+    table.getColumns().add(column);
   }
 }

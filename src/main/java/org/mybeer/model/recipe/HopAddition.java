@@ -6,6 +6,7 @@ package org.mybeer.model.recipe;
 
 import org.mybeer.model.ingredient.Hop;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -28,16 +29,17 @@ public class HopAddition {
 
   @ManyToOne
   private Hop hop;
-  private BigDecimal weight;
+  @Column(name = "weight")
+  private BigDecimal amount;
 
   public HopAddition() {
   }
 
-  public HopAddition(AdditionMoment additionMoment, int contactTime, Hop hop, BigDecimal weight) {
+  public HopAddition(AdditionMoment additionMoment, int contactTime, Hop hop, BigDecimal amount) {
     this.additionMoment = additionMoment;
     this.contactTime = contactTime;
     this.hop = hop;
-    this.weight = weight;
+    this.amount = amount;
   }
 
   public AdditionMoment getAdditionMoment() {
@@ -65,11 +67,11 @@ public class HopAddition {
   }
 
   public BigDecimal getAmount() {
-    return weight;
+    return amount;
   }
 
-  public void setWeight(BigDecimal weight) {
-    this.weight = weight;
+  public void setAmount(BigDecimal amount) {
+    this.amount = amount;
   }
 
   @Override
