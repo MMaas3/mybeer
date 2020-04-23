@@ -29,7 +29,7 @@ public class App extends Application {
   }
 
   @Override
-  public void start(Stage stage) {
+  public void start(Stage stage) throws IOException {
 
     final TableView<Recipe> recipeTable = new TableView<>();
     final TableColumn<Recipe, String> nameColumn = new TableColumn<>();
@@ -45,24 +45,31 @@ public class App extends Application {
         return;
       }
       try {
-        final FXMLLoader fxmlLoader = new FXMLLoader();
-        AnchorPane recipe = fxmlLoader.load(new FileInputStream("src/main/resources/view/recipe.fxml"));
-        RecipeController controller = fxmlLoader.getController();
-        controller.setRecipe(selectedItems.get(0).getId());
+        final Long id = selectedItems.get(0).getId();
+        AnchorPane recipe = createRecipePane(id);
         stage.setScene(new Scene(recipe));
       } catch (IOException e) {
         e.printStackTrace();
       }
     });
 
-    final Pane pane = new Pane();
-    pane.getChildren().add(recipeTable);
-    pane.getChildren().add(openRecipe);
+    final AnchorPane pane = createRecipePane(20l);
+    // final Pane pane = new Pane();
+    // pane.getChildren().add(recipeTable);
+    // pane.getChildren().add(openRecipe);
 
-    Scene scene = new Scene(pane, 640, 480);
+    Scene scene = new Scene(pane);
 
     stage.setScene(scene);
     stage.show();
+  }
+
+  private AnchorPane createRecipePane(Long id) throws IOException {
+    final FXMLLoader fxmlLoader = new FXMLLoader();
+    AnchorPane recipe = fxmlLoader.load(new FileInputStream("src/main/resources/view/recipe.fxml"));
+    RecipeController controller = fxmlLoader.getController();
+    controller.setRecipe(id);
+    return recipe;
   }
 
   private List<Recipe> recipes() {
