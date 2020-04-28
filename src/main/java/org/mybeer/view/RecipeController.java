@@ -18,6 +18,8 @@ import org.hibernate.Session;
 import org.mybeer.hibernate.RecipeDao;
 import org.mybeer.hibernate.SessionFactorySingleton;
 import org.mybeer.model.ingredient.Yeast;
+import org.mybeer.model.mash.MashScheme;
+import org.mybeer.model.mash.MashStep;
 import org.mybeer.model.recipe.FermentableAddition;
 import org.mybeer.model.recipe.HopAddition;
 import org.mybeer.model.recipe.Recipe;
@@ -40,6 +42,14 @@ public class RecipeController {
   private TableView<HopAddition> hopsTable;
   @FXML
   private TableView<YeastAddition> yeastTable;
+  @FXML
+  private TextField mashWaterField;
+  @FXML
+  private TextField spargeWaterField;
+  @FXML
+  private TextField thicknessField;
+  @FXML
+  private TableView<MashStep> mashTable;
 
   public void setRecipe(Long recipeId) {
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
@@ -58,7 +68,26 @@ public class RecipeController {
       fillFermentablesTable();
       fillHopsTable();
       fillYeastTable();
+      fillMashTab();
     }
+  }
+
+  private void fillMashTab() {
+    final MashScheme mashScheme = recipe.getMashScheme();
+    mashWaterField.textProperty().bindBidirectional(
+        new SimpleObjectProperty<>(mashScheme.getMashWater()), new BigDecimalStringConverter()
+    );
+    spargeWaterField.textProperty().bindBidirectional(
+        new SimpleObjectProperty<>(mashScheme.getSpargeWater()), new BigDecimalStringConverter()
+    );
+    thicknessField.textProperty().bindBidirectional(
+        new SimpleObjectProperty<>(mashScheme.getThickness()), new BigDecimalStringConverter()
+    );
+
+    mashTable.setItems(FXCollections.observableArrayList(mashScheme.getMashSteps()));
+    this.addPropertyColumn("Temperature", "temperature", mashTable);
+    this.addPropertyColumn("Time", "time", mashTable);
+    this.addPropertyColumn("Thickness", "thickness", mashTable);
   }
 
   private void fillYeastTable() {
