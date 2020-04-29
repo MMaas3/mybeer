@@ -26,6 +26,10 @@ public class SpiceAddition {
   private int contactTime;
   private BigDecimal spiceMass;
 
+  public SpiceAddition() {
+
+  }
+
   public SpiceAddition(Spice spice, AdditionMoment additionMoment, int contactTime, BigDecimal spiceMass) {
 
     this.spice = spice;

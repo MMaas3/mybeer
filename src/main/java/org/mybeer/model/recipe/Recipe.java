@@ -18,6 +18,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -39,13 +40,16 @@ public class Recipe {
   private MashScheme mashScheme;
   private BigDecimal volume;
 
-  @OneToMany(cascade = CascadeType.ALL, targetEntity = FermentableAddition.class, fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  @JoinColumn(name = "recipe_id")
   private Set<FermentableAddition> fermentableAdditions;
 
-  @OneToMany(cascade = CascadeType.ALL, targetEntity = HopAddition.class, fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  @JoinColumn(name = "recipe_id")
   private Set<HopAddition> hopAdditions;
 
-  @OneToMany(cascade = CascadeType.ALL, targetEntity = YeastAddition.class, fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  @JoinColumn(name = "recipe_id")
   private Set<YeastAddition> yeastAdditions;
   private int oldId;
   private int efficiency;
@@ -59,7 +63,8 @@ public class Recipe {
   @ManyToOne
   private BrewingSystem system;
 
-  @OneToMany(cascade = CascadeType.ALL, targetEntity = SpiceAddition.class, fetch = FetchType.EAGER)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+  @JoinColumn(name = "recipe_id")
   private Set<SpiceAddition> spiceAdditions;
 
   public Recipe() {

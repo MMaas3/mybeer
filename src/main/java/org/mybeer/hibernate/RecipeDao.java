@@ -32,4 +32,8 @@ public class RecipeDao extends GenericDao<Recipe> {
     final Query<Recipe> query = session.createQuery(criteriaQuery);
     return query.getResultStream();
   }
+
+  public Optional<Recipe> getById(Long id, Session session) {
+    return Optional.ofNullable(session.get(Recipe.class, id));
+  }
 }

@@ -30,6 +30,9 @@ public class FermentableAddition {
   private AdditionMoment additionMoment;
   private BigDecimal amount;
 
+  public FermentableAddition() {
+
+  }
 
   public FermentableAddition(Fermentable fermentable,
                              AdditionMoment additionMoment, BigDecimal weight) {

@@ -22,6 +22,10 @@ public class MashStep {
   @ManyToOne(optional = false)
   private MashScheme mashScheme;
 
+  public MashStep() {
+
+  }
+
   public MashStep(int number) {
     this.number = number;
   }
