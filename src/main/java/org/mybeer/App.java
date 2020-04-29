@@ -31,6 +31,13 @@ public class App extends Application {
   @Override
   public void start(Stage stage) throws IOException {
 
+    Scene recipeListScene = createRecipeListScene(stage);
+
+    stage.setScene(recipeListScene);
+    stage.show();
+  }
+
+  private Scene createRecipeListScene(Stage stage) {
     final TableView<Recipe> recipeTable = new TableView<>();
     final TableColumn<Recipe, String> nameColumn = new TableColumn<>();
     nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -38,38 +45,35 @@ public class App extends Application {
     final ObservableList<Recipe> recipes = FXCollections.observableArrayList(recipes());
     recipeTable.setItems(recipes);
 
-    final Button openRecipe = new Button("Open recipe");
-    openRecipe.setOnAction(event -> {
+    final Button openRecipeButton = new Button("Open recipe");
+    openRecipeButton.setOnAction(event -> {
       final ObservableList<Recipe> selectedItems = recipeTable.getSelectionModel().getSelectedItems();
       if (selectedItems.isEmpty()) {
         return;
       }
-      try {
-        final Long id = selectedItems.get(0).getId();
-        AnchorPane recipe = createRecipePane(id);
-        stage.setScene(new Scene(recipe));
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+      final Long id = selectedItems.get(0).getId();
+      stage.setScene(createRecipeScene(id, stage));
     });
 
-    final AnchorPane pane = createRecipePane(20l);
-    // final Pane pane = new Pane();
-    // pane.getChildren().add(recipeTable);
-    // pane.getChildren().add(openRecipe);
+    final Pane pane = new Pane();
+    pane.getChildren().add(recipeTable);
+    pane.getChildren().add(openRecipeButton);
 
-    Scene scene = new Scene(pane);
-
-    stage.setScene(scene);
-    stage.show();
+    return new Scene(pane);
   }
 
-  private AnchorPane createRecipePane(Long id) throws IOException {
+  private Scene createRecipeScene(Long id, Stage stage) {
     final FXMLLoader fxmlLoader = new FXMLLoader();
-    AnchorPane recipe = fxmlLoader.load(new FileInputStream("src/main/resources/view/recipe.fxml"));
+    AnchorPane recipePane = null;
+    try {
+      recipePane = fxmlLoader.load(new FileInputStream("src/main/resources/view/recipe.fxml"));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     RecipeController controller = fxmlLoader.getController();
-    controller.setRecipe(id);
-    return recipe;
+    controller.init(id, event -> stage.setScene(this.createRecipeListScene(stage)));
+
+    return new Scene(recipePane);
   }
 
   private List<Recipe> recipes() {

@@ -7,7 +7,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -50,8 +53,11 @@ public class RecipeController {
   private TextField thicknessField;
   @FXML
   private TableView<MashStep> mashTable;
+  @FXML
+  private Button backButton;
 
-  public void setRecipe(Long recipeId) {
+  public void init(Long recipeId, EventHandler<ActionEvent> actionEventEventHandler) {
+    this.backButton.setOnAction(actionEventEventHandler);
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final Optional<Recipe> recipeOptional = new RecipeDao().getById(recipeId, session);
       if(recipeOptional.isEmpty()) {
@@ -213,5 +219,9 @@ public class RecipeController {
     final TableColumn<T, U> column = new TableColumn<>(label);
     column.setCellValueFactory(new PropertyValueFactory<>(property));
     table.getColumns().add(column);
+  }
+
+  private void init() {
+
   }
 }
