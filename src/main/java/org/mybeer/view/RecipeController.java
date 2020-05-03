@@ -1,6 +1,8 @@
 package org.mybeer.view;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -11,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -101,35 +104,19 @@ public class RecipeController {
     this.<YeastAddition, BigDecimal>addPropertyColumn("Amount", "amount", yeastTable);
     final TableColumn<YeastAddition, String> yeastColumn = new TableColumn<>("Yeast");
     yeastColumn.setCellValueFactory(param -> {
-      final Yeast yeast = param.getValue().getYeast();
-      return new ObservableValue<>() {
-        @Override
-        public void addListener(ChangeListener<? super String> listener) {
-
-        }
-
-        @Override
-        public void removeListener(ChangeListener<? super String> listener) {
-
-        }
-
-        @Override
-        public String getValue() {
-          return yeast.getName();
-        }
-
-        @Override
-        public void addListener(InvalidationListener listener) {
-
-        }
-
-        @Override
-        public void removeListener(InvalidationListener listener) {
-
-        }
-
-      };
+      final String name = param.getValue().getYeast().getName();
+      return Bindings.createObjectBinding(() -> name);
     });
+    // yeastColumn.setCellFactory(col -> {
+    //   final TableCell<YeastAddition, String> cell = new TableCell<>();
+    //   cell.itemProperty().addListener(new ChangeListener<String>() {
+    //     @Override
+    //     public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+    //       // https://stackoverflow.com/questions/35131428/combobox-in-a-tableview-cell-in-javafx
+    //     }
+    //   });
+    //   return cell;
+    // });
     yeastTable.getColumns().add(yeastColumn);
     this.<YeastAddition, String>addPropertyColumn("Addtion moment", "additionMoment", yeastTable);
   }
@@ -141,32 +128,7 @@ public class RecipeController {
     final TableColumn<HopAddition, String> hopColumn = new TableColumn<>("Hop");
     hopColumn.setCellValueFactory(param -> {
       final HopAddition value = param.getValue();
-      return new ObservableValue<>() {
-        @Override
-        public void addListener(ChangeListener<? super String> listener) {
-
-        }
-
-        @Override
-        public void removeListener(ChangeListener<? super String> listener) {
-
-        }
-
-        @Override
-        public String getValue() {
-          return value.getHop().getName();
-        }
-
-        @Override
-        public void addListener(InvalidationListener listener) {
-
-        }
-
-        @Override
-        public void removeListener(InvalidationListener listener) {
-
-        }
-      };
+      return Bindings.createObjectBinding(() -> value.getHop().getName());
     });
     this.hopsTable.getColumns().add(hopColumn);
 
@@ -183,32 +145,7 @@ public class RecipeController {
     fermentableColumn.setCellValueFactory(
         param -> {
           final FermentableAddition addition = param.getValue();
-          return new ObservableValue<>() {
-            @Override
-            public void addListener(ChangeListener<? super String> listener) {
-
-            }
-
-            @Override
-            public void removeListener(ChangeListener<? super String> listener) {
-
-            }
-
-            @Override
-            public String getValue() {
-              return addition.getFermentable().getName();
-            }
-
-            @Override
-            public void addListener(InvalidationListener listener) {
-
-            }
-
-            @Override
-            public void removeListener(InvalidationListener listener) {
-
-            }
-          };
+          return Bindings.createObjectBinding(() -> addition.getFermentable().getName());
         });
     fermetablesTable.getColumns().add(fermentableColumn);
 
@@ -221,7 +158,4 @@ public class RecipeController {
     table.getColumns().add(column);
   }
 
-  private void init() {
-
-  }
 }
