@@ -115,13 +115,9 @@ public class Recipe {
       throw new IllegalArgumentException("Amount should be larger than 0.");
     }
 
-    if (hopAddition.getContactTime() <= 0) {
-      // throw new IllegalArgumentException("ContactTime should be larger than 0.");
-    }
-
     if (hopAddition.getAdditionMoment() == AdditionMoment.BOIL && hopAddition.getContactTime() > boilTime) {
       hopAddition.setContactTime(boilTime);
-      // throw new IllegalArgumentException("ContactTime should be smaller than or equal to the boil time: " + boilTime);
+      throw new IllegalArgumentException("ContactTime should be smaller than or equal to the boil time: " + boilTime);
     }
 
     this.hopAdditions.add(hopAddition);
