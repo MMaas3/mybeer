@@ -29,6 +29,8 @@ public class HopAddition {
 
   @ManyToOne
   private Hop hop;
+  private BigDecimal hopsAlphaAcid;
+
   @Column(name = "weight")
   private BigDecimal amount;
 
@@ -110,5 +112,13 @@ public class HopAddition {
 
   private void setId(Long id) {
     this.id = id;
+  }
+
+  public BigDecimal getHopsAlphaAcid() {
+    return hopsAlphaAcid;
+  }
+
+  public void setHopsAlphaAcid(BigDecimal hopsAlphaAcid) {
+    this.hopsAlphaAcid = hopsAlphaAcid;
   }
 }
