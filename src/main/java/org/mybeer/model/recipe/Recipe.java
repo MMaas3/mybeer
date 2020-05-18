@@ -52,7 +52,7 @@ public class Recipe {
   @JoinColumn(name = "recipe_id")
   private Set<YeastAddition> yeastAdditions;
   private int oldId;
-  private int efficiency;
+  private BigDecimal efficiency;
   @ManyToOne
   private BeerStyle beerStyle;
   private BigDecimal brewingVolume;
@@ -244,11 +244,11 @@ public class Recipe {
     return oldId;
   }
 
-  public void setEfficiency(int efficiency) {
+  public void setEfficiency(BigDecimal efficiency) {
     this.efficiency = efficiency;
   }
 
-  public int getEfficiency() {
+  public BigDecimal getEfficiency() {
     return efficiency;
   }
 

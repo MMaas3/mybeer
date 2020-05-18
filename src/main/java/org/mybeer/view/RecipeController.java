@@ -1,19 +1,14 @@
 package org.mybeer.view;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -21,9 +16,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.converter.BigDecimalStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import org.hibernate.Session;
+import org.mybeer.calculator.GravityCalculator;
+import org.mybeer.calculator.WaterCalculator;
+import org.mybeer.calculator.bitterness.BitternessCalculator;
+import org.mybeer.calculator.bitterness.RayDanielsBitternessMethod;
+import org.mybeer.calculator.colour.ColourCalculator;
+import org.mybeer.calculator.colour.DanielMoreyMethod;
 import org.mybeer.hibernate.RecipeDao;
 import org.mybeer.hibernate.SessionFactorySingleton;
-import org.mybeer.model.ingredient.Yeast;
 import org.mybeer.model.mash.MashScheme;
 import org.mybeer.model.mash.MashStep;
 import org.mybeer.model.recipe.FermentableAddition;
@@ -32,6 +32,7 @@ import org.mybeer.model.recipe.Recipe;
 import org.mybeer.model.recipe.YeastAddition;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 public class RecipeController {
@@ -58,6 +59,18 @@ public class RecipeController {
   private TableView<MashStep> mashTable;
   @FXML
   private Button backButton;
+  @FXML
+  private TextField descriptionField;
+  @FXML
+  private TextField gravityField;
+  @FXML
+  private TextField efficiencyField;
+  @FXML
+  private TextField colourField;
+  @FXML
+  private TextField bitternessField;
+  @FXML
+  private TextField totalWaterField;
 
   public void init(Long recipeId, EventHandler<ActionEvent> actionEventEventHandler) {
     this.backButton.setOnAction(actionEventEventHandler);
@@ -69,11 +82,21 @@ public class RecipeController {
 
       this.recipe = recipeOptional.get();
       nameField.textProperty().bindBidirectional(new SimpleStringProperty(this.recipe.getName()));
+      descriptionField.textProperty().bindBidirectional(new SimpleObjectProperty<>(this.recipe.getDescription()));
       boilTimeField.textProperty()
                    .bindBidirectional(new SimpleIntegerProperty(this.recipe.getBoilTime()), new NumberStringConverter());
+      final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
+      efficiencyField.textProperty()
+                     .bindBidirectional(new SimpleObjectProperty<>(recipe.getEfficiency()),bigDecimalConverter);
       volumeField.textProperty()
-                 .bindBidirectional(new SimpleObjectProperty<>(this.recipe.getVolume()), new BigDecimalStringConverter());
-
+                 .bindBidirectional(new SimpleObjectProperty<>(this.recipe.getVolume()), bigDecimalConverter);
+      final BigDecimal gravity = calculateGravity(recipe);
+      gravityField.textProperty()
+                  .bindBidirectional(new SimpleObjectProperty<>(gravity), bigDecimalConverter);
+      colourField.textProperty()
+                 .bindBidirectional(new SimpleObjectProperty<>(calculateColour(recipe)), bigDecimalConverter);
+      bitternessField.textProperty()
+                     .bindBidirectional(new SimpleObjectProperty<>(calculateBitterness(recipe, gravity)), bigDecimalConverter);
       fillFermentablesTable();
       fillHopsTable();
       fillYeastTable();
@@ -81,22 +104,46 @@ public class RecipeController {
     }
   }
 
+  private BigDecimal calculateBitterness(Recipe recipe, BigDecimal gravity) {
+    final BitternessCalculator bitternessCalculator = new BitternessCalculator(new RayDanielsBitternessMethod());
+    return bitternessCalculator.calculate(recipe.getHopAdditions(), gravity, recipe.getVolume())
+                               .setScale(0, RoundingMode.HALF_UP);
+  }
+
+  private BigDecimal calculateColour(Recipe recipe) {
+    final ColourCalculator colourCalculator = new ColourCalculator(recipe.getVolume());
+    return colourCalculator.calculateEBC(new DanielMoreyMethod(), recipe.getFermentableAdditions())
+                           .setScale(0, RoundingMode.HALF_UP);
+  }
+
+  private BigDecimal calculateGravity(Recipe recipe) {
+    final GravityCalculator gravityCalculator = new GravityCalculator();
+    return gravityCalculator.calculate(recipe.getFermentableAdditions(), recipe.getVolume(), recipe.getEfficiency())
+                            .setScale(3, RoundingMode.HALF_UP);
+  }
+
   private void fillMashTab() {
     final MashScheme mashScheme = recipe.getMashScheme();
-    mashWaterField.textProperty().bindBidirectional(
-        new SimpleObjectProperty<>(mashScheme.getMashWater()), new BigDecimalStringConverter()
+    final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
+    mashWaterField.textProperty()
+                  .bindBidirectional(new SimpleObjectProperty<>(mashScheme.getMashWater()), bigDecimalConverter);
+    spargeWaterField.textProperty()
+                    .bindBidirectional(new SimpleObjectProperty<>(mashScheme.getSpargeWater()), bigDecimalConverter
     );
-    spargeWaterField.textProperty().bindBidirectional(
-        new SimpleObjectProperty<>(mashScheme.getSpargeWater()), new BigDecimalStringConverter()
-    );
-    thicknessField.textProperty().bindBidirectional(
-        new SimpleObjectProperty<>(mashScheme.getThickness()), new BigDecimalStringConverter()
-    );
+    thicknessField.textProperty()
+                  .bindBidirectional(new SimpleObjectProperty<>(mashScheme.getThickness()), bigDecimalConverter);
+    totalWaterField.textProperty()
+                   .bindBidirectional(new SimpleObjectProperty<>(calculateTotalWater(recipe)), bigDecimalConverter);
 
     mashTable.setItems(FXCollections.observableArrayList(mashScheme.getMashSteps()));
     this.addPropertyColumn("Temperature", "temperature", mashTable);
     this.addPropertyColumn("Time", "time", mashTable);
     this.addPropertyColumn("Thickness", "thickness", mashTable);
+  }
+
+  private BigDecimal calculateTotalWater(Recipe recipe) {
+    final WaterCalculator waterCalculator = new WaterCalculator();
+    return waterCalculator.calculate(recipe);
   }
 
   private void fillYeastTable() {
@@ -124,14 +171,14 @@ public class RecipeController {
   private void fillHopsTable() {
     hopsTable.setItems(FXCollections.observableArrayList(this.recipe.getHopAdditions()));
     this.<HopAddition, BigDecimal>addPropertyColumn("Amount", "amount", hopsTable);
-    this.<HopAddition, String>addPropertyColumn("Moment", "additionMoment", hopsTable);
     final TableColumn<HopAddition, String> hopColumn = new TableColumn<>("Hop");
     hopColumn.setCellValueFactory(param -> {
       final HopAddition value = param.getValue();
       return Bindings.createObjectBinding(() -> value.getHop().getName());
     });
     this.hopsTable.getColumns().add(hopColumn);
-
+    this.addPropertyColumn("Alpha Acid %", "hopsAlphaAcid", hopsTable);
+    this.<HopAddition, String>addPropertyColumn("Moment", "additionMoment", hopsTable);
     this.<HopAddition, Integer>addPropertyColumn("Contact time", "contactTime", hopsTable);
 
   }
@@ -148,6 +195,14 @@ public class RecipeController {
           return Bindings.createObjectBinding(() -> addition.getFermentable().getName());
         });
     fermetablesTable.getColumns().add(fermentableColumn);
+
+    final TableColumn<FermentableAddition, BigDecimal> fermentableColourColumn = new TableColumn<>("Colour (EBC)");
+    fermentableColourColumn.setCellValueFactory(
+        param -> {
+          final FermentableAddition addition = param.getValue();
+          return Bindings.createObjectBinding(() -> addition.getFermentable().getColour());
+        });
+    fermetablesTable.getColumns().add(fermentableColourColumn);
 
     this.<FermentableAddition, String>addPropertyColumn("Moment", "additionMoment", this.fermetablesTable);
   }

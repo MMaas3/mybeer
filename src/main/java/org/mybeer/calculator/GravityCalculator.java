@@ -4,14 +4,14 @@ import org.mybeer.model.recipe.FermentableAddition;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 public class GravityCalculator {
 
   public static final BigDecimal PLATO_SG_CONSTANT = BigDecimal.valueOf(259);
 
-  public BigDecimal calculate(List<FermentableAddition> fermentableAdditions, BigDecimal volume,
+  public BigDecimal calculate(Collection<FermentableAddition> fermentableAdditions, BigDecimal volume,
                               BigDecimal efficiency) {
     final Optional<BigDecimal> plato = fermentableAdditions.stream()
                                                            .map(add -> calculatePlatoForAddition(add, volume))
