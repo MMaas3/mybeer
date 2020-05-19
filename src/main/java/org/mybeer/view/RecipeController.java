@@ -76,32 +76,43 @@ public class RecipeController {
     this.backButton.setOnAction(actionEventEventHandler);
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final Optional<Recipe> recipeOptional = new RecipeDao().getById(recipeId, session);
-      if(recipeOptional.isEmpty()) {
+      if (recipeOptional.isEmpty()) {
         throw new RuntimeException("Recipe does not exist");
       }
 
       this.recipe = recipeOptional.get();
-      nameField.textProperty().bindBidirectional(new SimpleStringProperty(this.recipe.getName()));
-      descriptionField.textProperty().bindBidirectional(new SimpleObjectProperty<>(this.recipe.getDescription()));
-      boilTimeField.textProperty()
-                   .bindBidirectional(new SimpleIntegerProperty(this.recipe.getBoilTime()), new NumberStringConverter());
-      final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
-      efficiencyField.textProperty()
-                     .bindBidirectional(new SimpleObjectProperty<>(recipe.getEfficiency()),bigDecimalConverter);
-      volumeField.textProperty()
-                 .bindBidirectional(new SimpleObjectProperty<>(this.recipe.getVolume()), bigDecimalConverter);
-      final BigDecimal gravity = calculateGravity(recipe);
-      gravityField.textProperty()
-                  .bindBidirectional(new SimpleObjectProperty<>(gravity), bigDecimalConverter);
-      colourField.textProperty()
-                 .bindBidirectional(new SimpleObjectProperty<>(calculateColour(recipe)), bigDecimalConverter);
-      bitternessField.textProperty()
-                     .bindBidirectional(new SimpleObjectProperty<>(calculateBitterness(recipe, gravity)), bigDecimalConverter);
-      fillFermentablesTable();
-      fillHopsTable();
-      fillYeastTable();
-      fillMashTab();
+      populateForm();
     }
+  }
+
+  private void populateForm() {
+    nameField.textProperty().bindBidirectional(new SimpleStringProperty(this.recipe.getName()));
+    descriptionField.textProperty().bindBidirectional(new SimpleObjectProperty<>(this.recipe.getDescription()));
+    boilTimeField.textProperty()
+                 .bindBidirectional(new SimpleIntegerProperty(this.recipe.getBoilTime()), new NumberStringConverter());
+    final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
+    efficiencyField.textProperty()
+                   .bindBidirectional(new SimpleObjectProperty<>(recipe.getEfficiency()), bigDecimalConverter);
+    volumeField.textProperty()
+               .bindBidirectional(new SimpleObjectProperty<>(this.recipe.getVolume()), bigDecimalConverter);
+    volumeField.textProperty().addListener(((observable, oldValue, newValue) -> {
+      if (newValue != null && !newValue.isBlank()) {
+        recipe.setVolume(bigDecimalConverter.fromString(newValue));
+        populateForm();
+      }
+    }));
+    final BigDecimal gravity = calculateGravity(recipe);
+    gravityField.textProperty()
+                .bindBidirectional(new SimpleObjectProperty<>(gravity), bigDecimalConverter);
+    colourField.textProperty()
+               .bindBidirectional(new SimpleObjectProperty<>(calculateColour(recipe)), bigDecimalConverter);
+    bitternessField.textProperty()
+                   .bindBidirectional(new SimpleObjectProperty<>(calculateBitterness(recipe, gravity)),
+                       bigDecimalConverter);
+    fillFermentablesTable();
+    fillHopsTable();
+    fillYeastTable();
+    fillMashTab();
   }
 
   private BigDecimal calculateBitterness(Recipe recipe, BigDecimal gravity) {
