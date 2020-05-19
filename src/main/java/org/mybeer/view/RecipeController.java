@@ -129,16 +129,16 @@ public class RecipeController {
                   .bindBidirectional(new SimpleObjectProperty<>(mashScheme.getMashWater()), bigDecimalConverter);
     spargeWaterField.textProperty()
                     .bindBidirectional(new SimpleObjectProperty<>(mashScheme.getSpargeWater()), bigDecimalConverter
-    );
+                    );
     thicknessField.textProperty()
                   .bindBidirectional(new SimpleObjectProperty<>(mashScheme.getThickness()), bigDecimalConverter);
     totalWaterField.textProperty()
                    .bindBidirectional(new SimpleObjectProperty<>(calculateTotalWater(recipe)), bigDecimalConverter);
 
     mashTable.setItems(FXCollections.observableArrayList(mashScheme.getMashSteps()));
-    this.addPropertyColumn("Temperature", "temperature", mashTable);
-    this.addPropertyColumn("Time", "time", mashTable);
-    this.addPropertyColumn("Thickness", "thickness", mashTable);
+    this.addPropertyColumn("Temperature", "temperature", mashTable, false, false);
+    this.addPropertyColumn("Time", "time", mashTable, false, false);
+    this.addPropertyColumn("Thickness", "thickness", mashTable, false, false);
   }
 
   private BigDecimal calculateTotalWater(Recipe recipe) {
@@ -148,7 +148,7 @@ public class RecipeController {
 
   private void fillYeastTable() {
     yeastTable.setItems(FXCollections.observableArrayList(recipe.getYeastAdditions()));
-    this.<YeastAddition, BigDecimal>addPropertyColumn("Amount", "amount", yeastTable);
+    this.<YeastAddition, BigDecimal>addPropertyColumn("Amount", "amount", yeastTable, false, false);
     final TableColumn<YeastAddition, String> yeastColumn = new TableColumn<>("Yeast");
     yeastColumn.setCellValueFactory(param -> {
       final String name = param.getValue().getYeast().getName();
@@ -165,28 +165,28 @@ public class RecipeController {
     //   return cell;
     // });
     yeastTable.getColumns().add(yeastColumn);
-    this.<YeastAddition, String>addPropertyColumn("Addtion moment", "additionMoment", yeastTable);
+    this.<YeastAddition, String>addPropertyColumn("Addtion moment", "additionMoment", yeastTable, false, false);
   }
 
   private void fillHopsTable() {
     hopsTable.setItems(FXCollections.observableArrayList(this.recipe.getHopAdditions()));
-    this.<HopAddition, BigDecimal>addPropertyColumn("Amount", "amount", hopsTable);
+    this.<HopAddition, BigDecimal>addPropertyColumn("Amount", "amount", hopsTable, false, false);
     final TableColumn<HopAddition, String> hopColumn = new TableColumn<>("Hop");
     hopColumn.setCellValueFactory(param -> {
       final HopAddition value = param.getValue();
       return Bindings.createObjectBinding(() -> value.getHop().getName());
     });
     this.hopsTable.getColumns().add(hopColumn);
-    this.addPropertyColumn("Alpha Acid %", "hopsAlphaAcid", hopsTable);
-    this.<HopAddition, String>addPropertyColumn("Moment", "additionMoment", hopsTable);
-    this.<HopAddition, Integer>addPropertyColumn("Contact time", "contactTime", hopsTable);
+    this.addPropertyColumn("Alpha Acid %", "hopsAlphaAcid", hopsTable, false, false);
+    this.<HopAddition, String>addPropertyColumn("Moment", "additionMoment", hopsTable, true, false);
+    this.<HopAddition, Integer>addPropertyColumn("Contact time", "contactTime", hopsTable, true, true);
 
   }
 
   private void fillFermentablesTable() {
     fermetablesTable.setItems(FXCollections.observableArrayList(this.recipe.getFermentableAdditions()));
 
-    this.<FermentableAddition, BigDecimal>addPropertyColumn("Amount", "amount", this.fermetablesTable);
+    this.<FermentableAddition, BigDecimal>addPropertyColumn("Amount", "amount", this.fermetablesTable, true, true);
 
     final TableColumn<FermentableAddition, String> fermentableColumn = new TableColumn<>("Fermentable");
     fermentableColumn.setCellValueFactory(
@@ -204,13 +204,21 @@ public class RecipeController {
         });
     fermetablesTable.getColumns().add(fermentableColourColumn);
 
-    this.<FermentableAddition, String>addPropertyColumn("Moment", "additionMoment", this.fermetablesTable);
+    this.<FermentableAddition, String>addPropertyColumn("Moment", "additionMoment", this.fermetablesTable, false,
+        false);
   }
 
-  private <T, U> void addPropertyColumn(String label, String property, TableView<T> table) {
+  private <T, U> void addPropertyColumn(String label, String property, TableView<T> table, boolean orderBy,
+                                        boolean reverseOrder) {
     final TableColumn<T, U> column = new TableColumn<>(label);
     column.setCellValueFactory(new PropertyValueFactory<>(property));
     table.getColumns().add(column);
+    if (orderBy) {
+      if (reverseOrder) {
+        column.setComparator(column.getComparator().reversed());
+      }
+      table.getSortOrder().add(column);
+    }
   }
 
 }
