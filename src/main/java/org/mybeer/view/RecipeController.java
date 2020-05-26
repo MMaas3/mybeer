@@ -9,10 +9,17 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.util.StringConverter;
 import javafx.util.converter.BigDecimalStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import org.hibernate.Session;
@@ -24,6 +31,8 @@ import org.mybeer.calculator.colour.ColourCalculator;
 import org.mybeer.calculator.colour.DanielMoreyMethod;
 import org.mybeer.hibernate.RecipeDao;
 import org.mybeer.hibernate.SessionFactorySingleton;
+import org.mybeer.hibernate.YeastDao;
+import org.mybeer.model.ingredient.Yeast;
 import org.mybeer.model.mash.MashScheme;
 import org.mybeer.model.mash.MashStep;
 import org.mybeer.model.recipe.FermentableAddition;
@@ -33,7 +42,11 @@ import org.mybeer.model.recipe.YeastAddition;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class RecipeController {
   @FXML
@@ -91,16 +104,9 @@ public class RecipeController {
     boilTimeField.textProperty()
                  .bindBidirectional(new SimpleIntegerProperty(this.recipe.getBoilTime()), new NumberStringConverter());
     final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
-    efficiencyField.textProperty()
-                   .bindBidirectional(new SimpleObjectProperty<>(recipe.getEfficiency()), bigDecimalConverter);
-    volumeField.textProperty()
-               .bindBidirectional(new SimpleObjectProperty<>(this.recipe.getVolume()), bigDecimalConverter);
-    volumeField.textProperty().addListener(((observable, oldValue, newValue) -> {
-      if (newValue != null && !newValue.isBlank()) {
-        recipe.setVolume(bigDecimalConverter.fromString(newValue));
-        populateForm();
-      }
-    }));
+    // FIXME work with decimals
+    bindField(bigDecimalConverter, efficiencyField, () -> recipe.getEfficiency(), (val) -> recipe.setEfficiency(val));
+    bindField(bigDecimalConverter, volumeField, () -> recipe.getVolume(), (val) -> recipe.setVolume(val));
     final BigDecimal gravity = calculateGravity(recipe);
     gravityField.textProperty()
                 .bindBidirectional(new SimpleObjectProperty<>(gravity), bigDecimalConverter);
@@ -113,6 +119,19 @@ public class RecipeController {
     fillHopsTable();
     fillYeastTable();
     fillMashTab();
+  }
+
+  private <T> void bindField(StringConverter<T> converter, TextField field, Supplier<T> value, Consumer<T> consumer) {
+    field.textProperty().bindBidirectional(new SimpleObjectProperty<T>(value.get()), converter);
+    field.focusedProperty().addListener(((observable, oldValue, newValue) -> {
+      System.out.println("out change focus");
+      if (!newValue) {
+        final String currentValue = field.textProperty().getValue();
+        if (currentValue != null && !currentValue.isBlank()) {
+          consumer.accept(converter.fromString(currentValue));
+        }
+      }
+    }));
   }
 
   private BigDecimal calculateBitterness(Recipe recipe, BigDecimal gravity) {
@@ -159,29 +178,66 @@ public class RecipeController {
 
   private void fillYeastTable() {
     yeastTable.setItems(FXCollections.observableArrayList(recipe.getYeastAdditions()));
-    this.<YeastAddition, BigDecimal>addPropertyColumn("Amount", "amount", yeastTable, false, false);
-    final TableColumn<YeastAddition, String> yeastColumn = new TableColumn<>("Yeast");
+    // this.<YeastAddition, BigDecimal>addPropertyColumn("Amount", "amount", yeastTable, false, false);
+    yeastTable.setEditable(true);
+
+    final TableColumn<YeastAddition, BigDecimal> amountColumn = new TableColumn<>("Amount");
+    amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+    amountColumn.setComparator(amountColumn.getComparator());
+    amountColumn.setCellFactory(TextFieldTableCell.forTableColumn(new BigDecimalStringConverter()));
+    amountColumn.setOnEditCommit((event -> {
+      event.getTableView().getItems().get(event.getTablePosition().getRow()).setAmount(event.getNewValue());
+    }));
+    amountColumn.setEditable(true);
+    yeastTable.getColumns().add(amountColumn);
+    yeastTable.getSortOrder().add(amountColumn);
+
+
+    final TableColumn<YeastAddition, ComboBox<Yeast>> yeastColumn = new TableColumn<>("Yeast");
     yeastColumn.setCellValueFactory(param -> {
-      final String name = param.getValue().getYeast().getName();
-      return Bindings.createObjectBinding(() -> name);
+      final ComboBox<Yeast> comboBox;
+      final Yeast yeast = param.getValue().getYeast();
+      try (Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
+        final List<Yeast> yeasts = new YeastDao().getAll(session).collect(Collectors.toList());
+        comboBox = new ComboBox<>(FXCollections.observableArrayList(yeasts));
+        comboBox.setValue(yeast);
+        comboBox.setConverter(new StringConverter<>() {
+          @Override
+          public String toString(Yeast object) {
+            return object.getName();
+          }
+
+          @Override
+          public Yeast fromString(String string) {
+            return yeasts.stream().filter(yeast -> yeast.getName().equals(string)).findAny().orElseThrow();
+          }
+        });
+        comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+          param.getValue().setYeast(newValue);
+        });
+      }
+
+      return Bindings.createObjectBinding(() -> comboBox);
     });
-    // yeastColumn.setCellFactory(col -> {
-    //   final TableCell<YeastAddition, String> cell = new TableCell<>();
-    //   cell.itemProperty().addListener(new ChangeListener<String>() {
-    //     @Override
-    //     public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-    //       // https://stackoverflow.com/questions/35131428/combobox-in-a-tableview-cell-in-javafx
-    //     }
-    //   });
-    //   return cell;
-    // });
+    yeastColumn.setEditable(true);
     yeastTable.getColumns().add(yeastColumn);
+
     this.<YeastAddition, String>addPropertyColumn("Addtion moment", "additionMoment", yeastTable, false, false);
   }
 
   private void fillHopsTable() {
     hopsTable.setItems(FXCollections.observableArrayList(this.recipe.getHopAdditions()));
-    this.<HopAddition, BigDecimal>addPropertyColumn("Amount", "amount", hopsTable, false, false);
+    hopsTable.setEditable(true);
+    // this.<HopAddition, BigDecimal>addPropertyColumn("Amount", "amount", hopsTable, false, false);
+    final TableColumn<HopAddition, BigDecimal> amountColumn = new TableColumn<>("Amount");
+    amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+    amountColumn.setCellFactory(TextFieldTableCell.forTableColumn(new BigDecimalStringConverter()));
+    amountColumn.setOnEditCommit((event -> {
+      event.getTableView().getItems().get(event.getTablePosition().getRow()).setAmount(event.getNewValue());
+    }));
+    amountColumn.setEditable(true);
+    hopsTable.getColumns().add(amountColumn);
+
     final TableColumn<HopAddition, String> hopColumn = new TableColumn<>("Hop");
     hopColumn.setCellValueFactory(param -> {
       final HopAddition value = param.getValue();
