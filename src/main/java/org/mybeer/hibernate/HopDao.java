@@ -11,6 +11,9 @@ import javax.persistence.criteria.Root;
 import java.util.Optional;
 
 public class HopDao extends GenericDao<Hop> {
+  public HopDao() {
+    super(Hop.class);
+  }
 
   public Optional<Hop> findByNameAndForm(String name, HopForm hopForm, Session session) {
     final CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();

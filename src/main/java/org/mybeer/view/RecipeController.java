@@ -10,15 +10,11 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.SingleSelectionModel;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.util.StringConverter;
 import javafx.util.converter.BigDecimalStringConverter;
 import javafx.util.converter.NumberStringConverter;
@@ -29,9 +25,13 @@ import org.mybeer.calculator.bitterness.BitternessCalculator;
 import org.mybeer.calculator.bitterness.RayDanielsBitternessMethod;
 import org.mybeer.calculator.colour.ColourCalculator;
 import org.mybeer.calculator.colour.DanielMoreyMethod;
+import org.mybeer.hibernate.FermentableDao;
+import org.mybeer.hibernate.HopDao;
 import org.mybeer.hibernate.RecipeDao;
 import org.mybeer.hibernate.SessionFactorySingleton;
 import org.mybeer.hibernate.YeastDao;
+import org.mybeer.model.ingredient.Fermentable;
+import org.mybeer.model.ingredient.Hop;
 import org.mybeer.model.ingredient.Yeast;
 import org.mybeer.model.mash.MashScheme;
 import org.mybeer.model.mash.MashStep;
@@ -84,9 +84,12 @@ public class RecipeController {
   private TextField bitternessField;
   @FXML
   private TextField totalWaterField;
+  @FXML
+  private Button refreshButton;
 
   public void init(Long recipeId, EventHandler<ActionEvent> actionEventEventHandler) {
     this.backButton.setOnAction(actionEventEventHandler);
+    this.refreshButton.setOnAction((actionEvent) -> populateForm());
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final Optional<Recipe> recipeOptional = new RecipeDao().getById(recipeId, session);
       if (recipeOptional.isEmpty()) {
@@ -195,11 +198,11 @@ public class RecipeController {
 
     final TableColumn<YeastAddition, ComboBox<Yeast>> yeastColumn = new TableColumn<>("Yeast");
     yeastColumn.setCellValueFactory(param -> {
-      final ComboBox<Yeast> comboBox;
+      final ComboBox<Yeast> comboBox = new ComboBox<>();
       final Yeast yeast = param.getValue().getYeast();
       try (Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
         final List<Yeast> yeasts = new YeastDao().getAll(session).collect(Collectors.toList());
-        comboBox = new ComboBox<>(FXCollections.observableArrayList(yeasts));
+        comboBox.setItems(FXCollections.observableArrayList(yeasts));
         comboBox.setValue(yeast);
         comboBox.setConverter(new StringConverter<>() {
           @Override
@@ -231,36 +234,108 @@ public class RecipeController {
     // this.<HopAddition, BigDecimal>addPropertyColumn("Amount", "amount", hopsTable, false, false);
     final TableColumn<HopAddition, BigDecimal> amountColumn = new TableColumn<>("Amount");
     amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-    amountColumn.setCellFactory(TextFieldTableCell.forTableColumn(new BigDecimalStringConverter()));
+    final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
+    amountColumn.setCellFactory(TextFieldTableCell.forTableColumn(bigDecimalConverter));
     amountColumn.setOnEditCommit((event -> {
       event.getTableView().getItems().get(event.getTablePosition().getRow()).setAmount(event.getNewValue());
     }));
     amountColumn.setEditable(true);
     hopsTable.getColumns().add(amountColumn);
 
-    final TableColumn<HopAddition, String> hopColumn = new TableColumn<>("Hop");
+    final TableColumn<HopAddition, ComboBox<Hop>> hopColumn = new TableColumn<>("Hop");
     hopColumn.setCellValueFactory(param -> {
       final HopAddition value = param.getValue();
-      return Bindings.createObjectBinding(() -> value.getHop().getName());
+      final ComboBox<Hop> comboBox = new ComboBox<>();
+      try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
+        final HopDao hopDao = new HopDao();
+        final List<Hop> hops = hopDao.getAll(session).collect(Collectors.toList());
+        comboBox.setItems(FXCollections.observableArrayList(hops));
+
+        comboBox.setConverter(new StringConverter<>() {
+          @Override
+          public String toString(Hop hop) {
+            return hop.getName();
+          }
+
+          @Override
+          public Hop fromString(String string) {
+            return hops.stream().filter(hop -> hop.getName().equals(string)).findFirst().orElseThrow();
+          }
+        });
+      }
+      comboBox.setValue(value.getHop());
+      comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+        param.getValue().setHop(newValue);
+        param.getValue().setHopsAlphaAcid(newValue.getAlphaAcidPercentageMin());
+      });
+
+      return Bindings.createObjectBinding(() -> comboBox);
     });
     this.hopsTable.getColumns().add(hopColumn);
-    this.addPropertyColumn("Alpha Acid %", "hopsAlphaAcid", hopsTable, false, false);
+
+    final TableColumn<HopAddition, BigDecimal> alphaAcidColumn = new TableColumn<>("Alpha Acid %");
+    alphaAcidColumn.setCellValueFactory(new PropertyValueFactory<>("hopsAlphaAcid"));
+    alphaAcidColumn.setCellFactory(TextFieldTableCell.forTableColumn(bigDecimalConverter));
+    alphaAcidColumn.setEditable(true);
+    alphaAcidColumn.setOnEditCommit((event -> {
+      event.getTableView().getItems().get(event.getTablePosition().getRow()).setHopsAlphaAcid(event.getNewValue());
+    }));
+    hopsTable.getColumns().add(alphaAcidColumn);
+
+
     this.<HopAddition, String>addPropertyColumn("Moment", "additionMoment", hopsTable, true, false);
     this.<HopAddition, Integer>addPropertyColumn("Contact time", "contactTime", hopsTable, true, true);
 
   }
 
   private void fillFermentablesTable() {
+    fermetablesTable.setEditable(true);
     fermetablesTable.setItems(FXCollections.observableArrayList(this.recipe.getFermentableAdditions()));
 
-    this.<FermentableAddition, BigDecimal>addPropertyColumn("Amount", "amount", this.fermetablesTable, true, true);
+    // this.<FermentableAddition, BigDecimal>addPropertyColumn("Amount", "amount", this.fermetablesTable, true, true);
 
-    final TableColumn<FermentableAddition, String> fermentableColumn = new TableColumn<>("Fermentable");
-    fermentableColumn.setCellValueFactory(
-        param -> {
-          final FermentableAddition addition = param.getValue();
-          return Bindings.createObjectBinding(() -> addition.getFermentable().getName());
+    final TableColumn<FermentableAddition, BigDecimal> amountColumn = new TableColumn<>("Amount");
+    amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+    final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
+    amountColumn.setCellFactory(TextFieldTableCell.forTableColumn(bigDecimalConverter));
+    amountColumn.setOnEditCommit((event -> {
+      event.getTableView().getItems().get(event.getTablePosition().getRow()).setAmount(event.getNewValue());
+    }));
+    amountColumn.setEditable(true);
+    fermetablesTable.getSortOrder().add(amountColumn);
+    fermetablesTable.getColumns().add(amountColumn);
+
+    final TableColumn<FermentableAddition, ComboBox<Fermentable>> fermentableColumn = new TableColumn<>("Fermentable");
+    fermentableColumn.setCellValueFactory(param -> {
+      final FermentableAddition fermentableAddition = param.getValue();
+      final ComboBox<Fermentable> comboBox = new ComboBox<>();
+
+      try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
+        final FermentableDao fermentableDao = new FermentableDao();
+        final List<Fermentable> fermentables = fermentableDao.getAll(session).collect(Collectors.toList());
+        comboBox.setItems(FXCollections.observableArrayList(fermentables));
+        comboBox.setConverter(new StringConverter<Fermentable>() {
+          @Override
+          public String toString(Fermentable fermentable) {
+            return fermentable.getName();
+          }
+
+          @Override
+          public Fermentable fromString(String name) {
+            return fermentables.stream().filter(fermentable -> fermentable.getName().equals(name)).findFirst()
+                               .orElseThrow();
+          }
         });
+      }
+
+      comboBox.setValue(fermentableAddition.getFermentable());
+      comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+        param.getValue().setFermentable(newValue);
+      });
+
+      return Bindings.createObjectBinding(() -> comboBox);
+    });
+    fermentableColumn.setEditable(true);
     fermetablesTable.getColumns().add(fermentableColumn);
 
     final TableColumn<FermentableAddition, BigDecimal> fermentableColourColumn = new TableColumn<>("Colour (EBC)");

@@ -31,9 +31,8 @@ public class App extends Application {
   @Override
   public void start(Stage stage) throws IOException {
 
-    Scene recipeListScene = createRecipeListScene(stage);
+    stage.setScene(createRecipeListScene(stage));
 
-    stage.setScene(recipeListScene);
     stage.show();
   }
 

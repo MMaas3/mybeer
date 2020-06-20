@@ -6,6 +6,7 @@
 <AnchorPane prefHeight="850.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.mybeer.view.RecipeController">
   <children>
     <Button fx:id="backButton" layoutX="50">Back</Button>
+    <Button fx:id="refreshButton" layoutX="150.0" mnemonicParsing="false" text="Refresh" />
     <GridPane layoutX="50.0" layoutY="25" prefHeight="100.0" prefWidth="600.0">
       <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" prefWidth="125" />
@@ -84,7 +85,7 @@
                   </rowConstraints>
                   <children>
                     <Label text="Water total" />
-                    <TextField disable="true" fx:id="totalWaterField" prefWidth="37.0" GridPane.columnIndex="1" />
+                    <TextField fx:id="totalWaterField" disable="true" prefWidth="37.0" GridPane.columnIndex="1" />
                     <Label text="Mash water" GridPane.rowIndex="1" />
                     <TextField fx:id="mashWaterField" prefWidth="37.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                     <Label text="Sparge water" GridPane.rowIndex="2" />
