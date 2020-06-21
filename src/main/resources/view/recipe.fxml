@@ -50,16 +50,8 @@
                     <TableView fx:id="fermetablesTable" layoutX="10" layoutY="35.0" prefHeight="181.0" prefWidth="880.0" />
                   </children>
                 </AnchorPane>
-                <AnchorPane layoutY="260.0" prefHeight="200.0" prefWidth="600.0">
-                  <children>
-                    <Label layoutX="10" layoutY="14.0" text="Hops" />
-                    <Label layoutX="275.0" layoutY="14.0" prefHeight="16.0" prefWidth="75.0" text="Bitterness" />
-                    <TextField fx:id="bitternessField" disable="true" layoutX="361.0" layoutY="9.0" prefHeight="26.0" prefWidth="88.0" />
-                    <Label layoutX="460.0" layoutY="14.0" text="IBU" />
-                    <TableView fx:id="hopsTable" layoutX="10" layoutY="35.0" prefHeight="181.0" prefWidth="880.0" />
-                  </children>
-                </AnchorPane>
-                <fx:include fx:id="yeastTable" source="YeastTable.fxml" layoutY="520"/>
+                <fx:include fx:id="hopsTable" source="HopsTable.fxml" layoutY="260" />
+                <fx:include fx:id="yeastTable" source="YeastTable.fxml" layoutY="550"/>
               </children>
             </AnchorPane>
           </content>
