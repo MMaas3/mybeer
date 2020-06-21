@@ -3,16 +3,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="850.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.mybeer.view.RecipeController">
+<AnchorPane prefHeight="1000" prefWidth="1000" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.mybeer.view.RecipeController">
   <children>
     <Button fx:id="backButton" layoutX="50">Back</Button>
     <Button fx:id="refreshButton" layoutX="150.0" mnemonicParsing="false" text="Refresh" />
-    <GridPane layoutX="50.0" layoutY="25" prefHeight="100.0" prefWidth="600.0">
+    <Button fx:id="saveButton" layoutX="250.0" mnemonicParsing="false" text="Save" />
+    <GridPane layoutX="50.0" layoutY="25" prefHeight="100.0" prefWidth="900.0">
       <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" prefWidth="125" />
-        <ColumnConstraints hgrow="SOMETIMES" maxWidth="225.0" percentWidth="0.0" />
-        <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" prefWidth="125" />
-        <ColumnConstraints hgrow="SOMETIMES" maxWidth="225.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" prefWidth="125.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" percentWidth="0.0" prefWidth="300.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="0.0" prefWidth="0.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="300.0" />
       </columnConstraints>
       <rowConstraints>
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -21,7 +22,7 @@
       </rowConstraints>
       <children>
         <Label text="Name" />
-        <TextField fx:id="nameField" GridPane.columnIndex="1" />
+        <TextField fx:id="nameField" prefWidth="100.0" GridPane.columnIndex="1" />
         <Label text="Description" GridPane.columnIndex="2" />
         <TextField fx:id="descriptionField" GridPane.columnIndex="3" />
         <Label text="Boil time" GridPane.rowIndex="1" />
@@ -34,7 +35,7 @@
         <TextField fx:id="gravityField" disable="true" GridPane.columnIndex="3" GridPane.rowIndex="2" />
       </children>
     </GridPane>
-    <TabPane layoutX="50.0" layoutY="128.0" prefHeight="700.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
+    <TabPane layoutX="50.0" layoutY="128.0" prefHeight="850.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE">
       <tabs>
         <Tab text="Ingredients">
           <content>
@@ -46,24 +47,19 @@
                     <Label layoutX="275.0" layoutY="14.0" prefHeight="16.0" prefWidth="50.0" text="Colour" />
                     <TextField fx:id="colourField" disable="true" layoutX="361.0" layoutY="9.0" prefHeight="26.0" prefWidth="88.0" />
                     <Label layoutX="460.0" layoutY="14.0" text="EBC" />
-                    <TableView fx:id="fermetablesTable" layoutX="10" layoutY="35.0" prefHeight="181.0" prefWidth="500.0" />
+                    <TableView fx:id="fermetablesTable" layoutX="10" layoutY="35.0" prefHeight="181.0" prefWidth="880.0" />
                   </children>
                 </AnchorPane>
-                <AnchorPane layoutY="210.0" prefHeight="200.0" prefWidth="600.0">
+                <AnchorPane layoutY="260.0" prefHeight="200.0" prefWidth="600.0">
                   <children>
                     <Label layoutX="10" layoutY="14.0" text="Hops" />
                     <Label layoutX="275.0" layoutY="14.0" prefHeight="16.0" prefWidth="75.0" text="Bitterness" />
                     <TextField fx:id="bitternessField" disable="true" layoutX="361.0" layoutY="9.0" prefHeight="26.0" prefWidth="88.0" />
                     <Label layoutX="460.0" layoutY="14.0" text="IBU" />
-                    <TableView fx:id="hopsTable" layoutX="10" layoutY="35.0" prefHeight="181.0" prefWidth="500.0" />
+                    <TableView fx:id="hopsTable" layoutX="10" layoutY="35.0" prefHeight="181.0" prefWidth="880.0" />
                   </children>
                 </AnchorPane>
-                <AnchorPane layoutY="420.0" prefHeight="200.0" prefWidth="600.0">
-                  <children>
-                    <Label layoutX="10" layoutY="14.0" text="Yeast" />
-                    <TableView fx:id="yeastTable" layoutX="10" layoutY="35.0" prefHeight="181.0" prefWidth="500.0" />
-                  </children>
-                </AnchorPane>
+                <fx:include fx:id="yeastTable" source="YeastTable.fxml" layoutY="520"/>
               </children>
             </AnchorPane>
           </content>
@@ -72,7 +68,7 @@
           <content>
             <AnchorPane>
               <children>
-                <GridPane layoutX="5" layoutY="15.0" prefHeight="120.0" prefWidth="500.0">
+                <GridPane layoutX="5" layoutY="15.0" prefHeight="120.0" prefWidth="893.0">
                   <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -97,7 +93,7 @@
                 <AnchorPane layoutY="150.0" prefHeight="145.0" prefWidth="500.0">
                   <children>
                     <Label layoutX="10" layoutY="14.0" text="Mashsteps" />
-                    <TableView fx:id="mashTable" layoutX="10" layoutY="35.0" prefHeight="181.0" prefWidth="500.0" />
+                    <TableView fx:id="mashTable" layoutX="10" layoutY="35.0" prefHeight="181.0" prefWidth="889.0" />
                   </children>
                 </AnchorPane>
               </children>
