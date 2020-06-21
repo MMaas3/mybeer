@@ -1,6 +1,5 @@
 package org.mybeer.view;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -9,12 +8,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.StringConverter;
 import javafx.util.converter.BigDecimalStringConverter;
 import javafx.util.converter.NumberStringConverter;
@@ -26,23 +23,18 @@ import org.mybeer.calculator.bitterness.BitternessCalculator;
 import org.mybeer.calculator.bitterness.RayDanielsBitternessMethod;
 import org.mybeer.calculator.colour.ColourCalculator;
 import org.mybeer.calculator.colour.DanielMoreyMethod;
-import org.mybeer.hibernate.FermentableDao;
 import org.mybeer.hibernate.RecipeDao;
 import org.mybeer.hibernate.SessionFactorySingleton;
-import org.mybeer.model.ingredient.Fermentable;
 import org.mybeer.model.mash.MashScheme;
 import org.mybeer.model.mash.MashStep;
 import org.mybeer.model.recipe.FermentableAddition;
-import org.mybeer.model.recipe.HopAddition;
 import org.mybeer.model.recipe.Recipe;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class RecipeController {
   @FXML
@@ -52,8 +44,6 @@ public class RecipeController {
   @FXML
   private TextField volumeField;
   private Recipe recipe;
-  @FXML
-  private TableView<FermentableAddition> fermetablesTable;
   @FXML
   private TextField mashWaterField;
   @FXML
@@ -71,10 +61,6 @@ public class RecipeController {
   @FXML
   private TextField efficiencyField;
   @FXML
-  private TextField colourField;
-  @FXML
-  private TextField bitternessField;
-  @FXML
   private TextField totalWaterField;
   @FXML
   private Button refreshButton;
@@ -84,6 +70,9 @@ public class RecipeController {
   private YeastTableController yeastTableController;
   @FXML
   private HopsTableController hopsTableController;
+  @FXML
+  private FermentableTableController fermentableTableController;
+  private SimpleObjectProperty<BigDecimal> gravityProp;
 
 
   public void init(Long recipeId, EventHandler<ActionEvent> backAction) {
@@ -116,17 +105,17 @@ public class RecipeController {
     boilTimeField.textProperty()
                  .bindBidirectional(new SimpleIntegerProperty(this.recipe.getBoilTime()), new NumberStringConverter());
     final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
-    // FIXME work with decimals
     bindField(bigDecimalConverter, efficiencyField, () -> recipe.getEfficiency(), (val) -> recipe.setEfficiency(val));
     bindField(bigDecimalConverter, volumeField, () -> recipe.getVolume(), (val) -> recipe.setVolume(val));
     final BigDecimal gravity = calculateGravity(recipe);
-    gravityField.textProperty()
-                .bindBidirectional(new SimpleObjectProperty<>(gravity), bigDecimalConverter);
-    colourField.textProperty()
-               .bindBidirectional(new SimpleObjectProperty<>(calculateColour(recipe)), bigDecimalConverter);
-    fillFermentablesTable();
-    yeastTableController.init(recipe.getYeastAdditions());
+    gravityProp = new SimpleObjectProperty<>(gravity);
+    gravityField.textProperty().bindBidirectional(gravityProp, bigDecimalConverter);
+
+    fermentableTableController.init(recipe.getFermentableAdditions(), () -> calculateColour(recipe), () -> {
+      gravityProp.setValue(calculateGravity(recipe));
+    }, () -> {});
     hopsTableController.init(recipe.getHopAdditions(), () -> calculateBitterness(recipe, gravity));
+    yeastTableController.init(recipe.getYeastAdditions());
     fillMashTab();
   }
 
@@ -185,71 +174,6 @@ public class RecipeController {
     return waterCalculator.calculate(recipe);
   }
 
-
-  private void fillFermentablesTable() {
-    fermetablesTable.setEditable(true);
-    fermetablesTable.setItems(FXCollections.observableArrayList(this.recipe.getFermentableAdditions()));
-
-    final TableColumn<FermentableAddition, BigDecimal> amountColumn = new TableColumn<>("Amount");
-    amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-    final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
-    amountColumn.setCellFactory(TextFieldTableCell.forTableColumn(bigDecimalConverter));
-    amountColumn.setOnEditCommit((event -> {
-      event.getTableView().getItems().get(event.getTablePosition().getRow()).setAmount(event.getNewValue());
-    }));
-    amountColumn.setEditable(true);
-    fermetablesTable.getSortOrder().add(amountColumn);
-    fermetablesTable.getColumns().add(amountColumn);
-
-    final TableColumn<FermentableAddition, ComboBox<Fermentable>> fermentableColumn = new TableColumn<>("Fermentable");
-    fermentableColumn.setCellValueFactory(param -> {
-      final FermentableAddition fermentableAddition = param.getValue();
-      final ComboBox<Fermentable> comboBox = createFermentableComboBox();
-
-      comboBox.setValue(fermentableAddition.getFermentable());
-      comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-        param.getValue().setFermentable(newValue);
-      });
-
-      return Bindings.createObjectBinding(() -> comboBox);
-    });
-    fermentableColumn.setEditable(true);
-    fermetablesTable.getColumns().add(fermentableColumn);
-
-    final TableColumn<FermentableAddition, BigDecimal> fermentableColourColumn = new TableColumn<>("Colour (EBC)");
-    fermentableColourColumn.setCellValueFactory(
-        param -> {
-          final FermentableAddition addition = param.getValue();
-          return Bindings.createObjectBinding(() -> addition.getFermentable().getColour());
-        });
-    fermetablesTable.getColumns().add(fermentableColourColumn);
-
-    this.<FermentableAddition, String>addPropertyColumn("Moment", "additionMoment", this.fermetablesTable, false,
-        false);
-  }
-
-  private ComboBox<Fermentable> createFermentableComboBox() {
-    final ComboBox<Fermentable> comboBox = new ComboBox<>();
-
-    try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
-      final FermentableDao fermentableDao = new FermentableDao();
-      final List<Fermentable> fermentables = fermentableDao.getAll(session).collect(Collectors.toList());
-      comboBox.setItems(FXCollections.observableArrayList(fermentables));
-      comboBox.setConverter(new StringConverter<Fermentable>() {
-        @Override
-        public String toString(Fermentable fermentable) {
-          return fermentable.getName();
-        }
-
-        @Override
-        public Fermentable fromString(String name) {
-          return fermentables.stream().filter(fermentable -> fermentable.getName().equals(name)).findFirst()
-                             .orElseThrow();
-        }
-      });
-    }
-    return comboBox;
-  }
 
   private <T, U> void addPropertyColumn(String label, String property, TableView<T> table, boolean orderBy,
                                         boolean reverseOrder) {
