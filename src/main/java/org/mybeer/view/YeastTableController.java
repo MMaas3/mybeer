@@ -50,8 +50,11 @@ public class YeastTableController extends AnchorPane {
     fillYeastTable();
     addButton.setOnAction((actionEvent) -> {
       final BigDecimal amount = new BigDecimal(amountField.textProperty().getValue());
+      amountField.textProperty().set("");
       final Yeast yeast = yeastBox.getValue();
+      yeastBox.setValue(null);
       final AdditionMoment moment = momentBox.getValue();
+      momentBox.setValue(null);
       final YeastAddition yeastAddition = new YeastAddition();
       yeastAddition.setYeast(yeast);
       yeastAddition.setAmount(amount);
@@ -61,7 +64,6 @@ public class YeastTableController extends AnchorPane {
       }
       yeastAdditions.add(yeastAddition);
       table.getItems().add(yeastAddition);
-      System.out.println("test");
     });
     removeButton.setOnAction((actionEvent) -> {
       final YeastAddition yeastAddition = table.getSelectionModel().getSelectedItem();

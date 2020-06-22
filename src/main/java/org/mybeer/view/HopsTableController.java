@@ -31,6 +31,7 @@ public class HopsTableController {
 
   private Set<HopAddition> hopAdditions;
   private Supplier<BigDecimal> calculateBitterness;
+  private SimpleObjectProperty<BigDecimal> bitternessProp;
   @FXML
   private TableView<HopAddition> table;
   @FXML
@@ -46,18 +47,22 @@ public class HopsTableController {
   @FXML
   private Button removeButton;
   @FXML
-  private TextField alphaAcid;
+  private TextField alphaAcidField;
   @FXML
   private TextField timeField;
 
-  public void init(Set<HopAddition> hopAdditions, Supplier<BigDecimal> calculateBitterness) {
+  public void init(Set<HopAddition> hopAdditions, Supplier<BigDecimal> calculateBitterness,
+                   SimpleObjectProperty<BigDecimal> bitternessProp) {
 
     this.hopAdditions = hopAdditions;
     this.calculateBitterness = calculateBitterness;
-    fillBitternessField();
+    this.bitternessProp = bitternessProp;
+    bitternessField.textProperty().bindBidirectional(bitternessProp, new BigDecimalStringConverter());
     fillComboBox(hopsBox);
     hopsBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-      alphaAcid.textProperty().setValue("" + newValue.getAlphaAcidPercentageMax());
+      if(newValue != null) {
+        alphaAcidField.textProperty().setValue("" + newValue.getAlphaAcidPercentageMax());
+      }
     });
     momentBox.setItems(FXCollections.observableArrayList(AdditionMoment.values()));
 
@@ -70,10 +75,15 @@ public class HopsTableController {
     });
     addButton.setOnAction((event -> {
       final BigDecimal amount = new BigDecimal(amountField.textProperty().getValue());
+      amountField.textProperty().setValue("");
       final Hop hop = hopsBox.getValue();
+      hopsBox.valueProperty().set(null);
       final AdditionMoment moment = momentBox.getValue();
-      final BigDecimal alphaAcid = new BigDecimal(this.alphaAcid.textProperty().getValue());
+      momentBox.setValue(null);
+      final BigDecimal alphaAcid = new BigDecimal(this.alphaAcidField.textProperty().getValue());
+      alphaAcidField.textProperty().set("");
       final int time = Integer.parseInt(this.timeField.textProperty().getValue());
+      timeField.textProperty().set("");
 
       final HopAddition hopAddition = new HopAddition();
       hopAddition.setAmount(amount);
@@ -87,12 +97,6 @@ public class HopsTableController {
     fillHopsTable();
   }
 
-  private void fillBitternessField() {
-    bitternessField.textProperty()
-                   .bindBidirectional(new SimpleObjectProperty<>(calculateBitterness.get()),
-                       new BigDecimalStringConverter());
-  }
-
   private void fillHopsTable() {
     table.setItems(FXCollections.observableArrayList(hopAdditions));
     table.setEditable(true);
@@ -101,21 +105,25 @@ public class HopsTableController {
     final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
     amountColumn.setCellFactory(TextFieldTableCell.forTableColumn(bigDecimalConverter));
     amountColumn.setOnEditCommit((event -> {
-      event.getTableView().getItems().get(event.getTablePosition().getRow()).setAmount(event.getNewValue());
+      final HopAddition hopAddition = event.getTableView().getItems().get(event.getTablePosition().getRow());
+      event.getTableView().getItems().remove(hopAddition);
+      hopAddition.setAmount(event.getNewValue());
+      event.getTableView().getItems().add(hopAddition);
     }));
     amountColumn.setEditable(true);
     table.getColumns().add(amountColumn);
 
     final TableColumn<HopAddition, ComboBox<Hop>> hopColumn = new TableColumn<>("Hop");
     hopColumn.setCellValueFactory(param -> {
-      final HopAddition value = param.getValue();
+      final HopAddition addition = param.getValue();
       final ComboBox<Hop> comboBox = new ComboBox<>();
       fillComboBox(comboBox);
-      comboBox.setValue(value.getHop());
+      comboBox.setValue(addition.getHop());
       comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-        param.getValue().setHop(newValue);
-        param.getValue().setHopsAlphaAcid(newValue.getAlphaAcidPercentageMin());
-        table.refresh();
+        table.getItems().remove(addition);
+        addition.setHop(newValue);
+        addition.setHopsAlphaAcid(newValue.getAlphaAcidPercentageMin());
+        table.getItems().add(addition);
       });
 
       return Bindings.createObjectBinding(() -> comboBox);
@@ -135,10 +143,10 @@ public class HopsTableController {
     this.<HopAddition, String>addPropertyColumn("Moment", "additionMoment", table, true, false);
     this.<HopAddition, Integer>addPropertyColumn("Contact time", "contactTime", table, true, true);
 
-    table.getItems().addListener(new ListChangeListener<HopAddition>() {
+    table.getItems().addListener(new ListChangeListener<>() {
       @Override
       public void onChanged(Change<? extends HopAddition> c) {
-        fillBitternessField();
+        bitternessProp.setValue(calculateBitterness.get());
       }
     });
   }

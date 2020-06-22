@@ -3,6 +3,8 @@ package org.mybeer.view;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -73,6 +75,8 @@ public class RecipeController {
   @FXML
   private FermentableTableController fermentableTableController;
   private SimpleObjectProperty<BigDecimal> gravityProp;
+  private SimpleObjectProperty<BigDecimal> bitternessProp;
+  private SimpleObjectProperty<BigDecimal> totalWaterProp;
 
 
   public void init(Long recipeId, EventHandler<ActionEvent> backAction) {
@@ -109,12 +113,17 @@ public class RecipeController {
     bindField(bigDecimalConverter, volumeField, () -> recipe.getVolume(), (val) -> recipe.setVolume(val));
     final BigDecimal gravity = calculateGravity(recipe);
     gravityProp = new SimpleObjectProperty<>(gravity);
+    gravityProp.addListener((observable, oldValue, newValue) -> {
+      bitternessProp.setValue(calculateBitterness(recipe, newValue));
+    });
+    bitternessProp = new SimpleObjectProperty<>(calculateBitterness(recipe, gravity));
     gravityField.textProperty().bindBidirectional(gravityProp, bigDecimalConverter);
-
+    totalWaterProp = new SimpleObjectProperty<>(calculateTotalWater(recipe));
     fermentableTableController.init(recipe.getFermentableAdditions(), () -> calculateColour(recipe), () -> {
+      totalWaterProp.set(calculateTotalWater(recipe));
       gravityProp.setValue(calculateGravity(recipe));
-    }, () -> {});
-    hopsTableController.init(recipe.getHopAdditions(), () -> calculateBitterness(recipe, gravity));
+    });
+    hopsTableController.init(recipe.getHopAdditions(), () -> calculateBitterness(recipe, gravity), bitternessProp);
     yeastTableController.init(recipe.getYeastAdditions());
     fillMashTab();
   }
@@ -160,8 +169,7 @@ public class RecipeController {
                     );
     thicknessField.textProperty()
                   .bindBidirectional(new SimpleObjectProperty<>(mashScheme.getThickness()), bigDecimalConverter);
-    totalWaterField.textProperty()
-                   .bindBidirectional(new SimpleObjectProperty<>(calculateTotalWater(recipe)), bigDecimalConverter);
+    totalWaterField.textProperty().bindBidirectional(totalWaterProp, bigDecimalConverter);
 
     mashTable.setItems(FXCollections.observableArrayList(mashScheme.getMashSteps()));
     this.addPropertyColumn("Temperature", "temperature", mashTable, false, false);

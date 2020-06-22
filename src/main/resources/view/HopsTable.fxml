@@ -20,7 +20,7 @@
   <Label layoutX="351.0" layoutY="228.0" text="Moment"/>
   <ComboBox fx:id="momentBox" layoutX="412.0" layoutY="223.0" prefWidth="150.0"/>
   <Label layoutX="573.0" layoutY="228.0" text="AA%"/>
-  <TextField fx:id="alphaAcid" layoutX="614.0" layoutY="223.0" prefHeight="26.0" prefWidth="90.0"/>
+  <TextField fx:id="alphaAcidField" layoutX="614.0" layoutY="223.0" prefHeight="26.0" prefWidth="90.0"/>
   <Label layoutX="718.0" layoutY="228.0" text="Time"/>
   <TextField fx:id="timeField" layoutX="764.0" layoutY="223.0" prefHeight="26.0" prefWidth="117.0"/>
   <Button fx:id="addButton" layoutX="28.0" layoutY="261.0" mnemonicParsing="false" text="Add"/>

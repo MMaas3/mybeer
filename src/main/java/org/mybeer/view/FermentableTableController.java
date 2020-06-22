@@ -44,23 +44,24 @@ public class FermentableTableController {
   private Button removeButton;
   private Set<FermentableAddition> fermentableAdditions;
   private Supplier<BigDecimal> calculateColour;
-  private Updater gravityUpdater;
-  private Updater waterUpdater;
+  private Updater recipeUpdater;
 
   public void init(Set<FermentableAddition> fermentableAdditions, Supplier<BigDecimal> calculateColour,
-                   Updater gravityUpdater, Updater waterUpdater) {
+                   Updater gravityUpdater) {
     this.fermentableAdditions = fermentableAdditions;
     this.calculateColour = calculateColour;
-    this.gravityUpdater = gravityUpdater;
-    this.waterUpdater = waterUpdater;
+    this.recipeUpdater = gravityUpdater;
     fillColourField();
     fillFermentableComboBox(fermentableBox);
     momentBox.setItems(FXCollections.observableArrayList(AdditionMoment.values()));
 
     addButton.setOnAction(actionEvent -> {
       final BigDecimal amount = new BigDecimal(amountField.textProperty().getValue());
+      amountField.textProperty().set("");
       final Fermentable fermentable = fermentableBox.getValue();
+      fermentableBox.setValue(null);
       final AdditionMoment additionMoment = momentBox.getValue();
+      momentBox.setValue(null);
       final FermentableAddition fermentableAddition = new FermentableAddition();
       fermentableAddition.setFermentable(fermentable);
       fermentableAddition.setAmount(amount);
@@ -95,7 +96,12 @@ public class FermentableTableController {
     final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
     amountColumn.setCellFactory(TextFieldTableCell.forTableColumn(bigDecimalConverter));
     amountColumn.setOnEditCommit((event -> {
-      event.getTableView().getItems().get(event.getTablePosition().getRow()).setAmount(event.getNewValue());
+
+      final FermentableAddition fermentableAddition =
+          event.getTableView().getItems().get(event.getTablePosition().getRow());
+      table.getItems().remove(fermentableAddition);
+      fermentableAddition.setAmount(event.getNewValue());
+      table.getItems().add(fermentableAddition);
     }));
     amountColumn.setEditable(true);
     table.getSortOrder().add(amountColumn);
@@ -110,7 +116,9 @@ public class FermentableTableController {
 
       comboBox.setValue(fermentableAddition.getFermentable());
       comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-        param.getValue().setFermentable(newValue);
+        table.getItems().remove(fermentableAddition);
+        fermentableAddition.setFermentable(newValue);
+        table.getItems().add(fermentableAddition);
       });
 
       return Bindings.createObjectBinding(() -> comboBox);
@@ -130,8 +138,7 @@ public class FermentableTableController {
 
     table.getItems().addListener((ListChangeListener<FermentableAddition>) c -> {
       fillColourField();
-      gravityUpdater.update();
-      waterUpdater.update();
+      recipeUpdater.update();
     });
   }
 
