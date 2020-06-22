@@ -3,8 +3,6 @@ package org.mybeer.view;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -25,11 +23,12 @@ import org.mybeer.calculator.bitterness.BitternessCalculator;
 import org.mybeer.calculator.bitterness.RayDanielsBitternessMethod;
 import org.mybeer.calculator.colour.ColourCalculator;
 import org.mybeer.calculator.colour.DanielMoreyMethod;
+import org.mybeer.hibernate.BrewingSystemDao;
 import org.mybeer.hibernate.RecipeDao;
 import org.mybeer.hibernate.SessionFactorySingleton;
+import org.mybeer.model.BrewingSystem;
 import org.mybeer.model.mash.MashScheme;
 import org.mybeer.model.mash.MashStep;
-import org.mybeer.model.recipe.FermentableAddition;
 import org.mybeer.model.recipe.Recipe;
 
 import java.math.BigDecimal;
@@ -65,8 +64,6 @@ public class RecipeController {
   @FXML
   private TextField totalWaterField;
   @FXML
-  private Button refreshButton;
-  @FXML
   private Button saveButton;
   @FXML
   private YeastTableController yeastTableController;
@@ -77,11 +74,11 @@ public class RecipeController {
   private SimpleObjectProperty<BigDecimal> gravityProp;
   private SimpleObjectProperty<BigDecimal> bitternessProp;
   private SimpleObjectProperty<BigDecimal> totalWaterProp;
+  private SimpleObjectProperty<BigDecimal> colourProp;
 
 
   public void init(Long recipeId, EventHandler<ActionEvent> backAction) {
     this.backButton.setOnAction(backAction);
-    this.refreshButton.setOnAction((actionEvent) -> populateForm());
     this.saveButton.setOnAction((actionEvent) -> {
       try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
         final RecipeDao recipeDao = new RecipeDao();
@@ -92,25 +89,65 @@ public class RecipeController {
     });
 
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
-      final Optional<Recipe> recipeOptional = new RecipeDao().getById(recipeId, session);
-      if (recipeOptional.isEmpty()) {
-        throw new RuntimeException("Recipe does not exist");
+      if (recipeId != null) {
+        final Optional<Recipe> recipeOptional = new RecipeDao().getById(recipeId, session);
+        if (recipeOptional.isEmpty()) {
+          throw new RuntimeException("Recipe does not exist");
+        }
+
+        this.recipe = recipeOptional.orElse(newRecipe(session));
+      } else {
+        this.recipe = newRecipe(session);
       }
-
-      this.recipe = recipeOptional.orElse(new Recipe());
-
       populateForm();
     }
   }
 
+  private Recipe newRecipe(Session session) {
+    final Recipe recipe = new Recipe();
+    final BrewingSystem brewingSystem = new BrewingSystemDao().findByName("Maas Pico Brouwerij").get();
+    recipe.setSystem(brewingSystem);
+    recipe.setVolume(BigDecimal.valueOf(20));
+    recipe.setEfficiency(BigDecimal.valueOf(0.75));
+
+    return recipe;
+  }
+
   private void populateForm() {
-    nameField.textProperty().bindBidirectional(new SimpleStringProperty(this.recipe.getName()));
-    descriptionField.textProperty().bindBidirectional(new SimpleObjectProperty<>(this.recipe.getDescription()));
-    boilTimeField.textProperty()
-                 .bindBidirectional(new SimpleIntegerProperty(this.recipe.getBoilTime()), new NumberStringConverter());
+    final SimpleStringProperty nameProp = new SimpleStringProperty(this.recipe.getName());
+    nameProp.addListener((observable, oldValue, newValue) -> {
+      recipe.setName(newValue);
+    });
+    nameField.textProperty().bindBidirectional(nameProp);
+    final SimpleObjectProperty<String> descriptionProp = new SimpleObjectProperty<>(this.recipe.getDescription());
+    descriptionProp.addListener((observable, oldValue, newValue) -> {
+      recipe.setDescription(newValue);
+    });
+    descriptionField.textProperty().bindBidirectional(descriptionProp);
+    final SimpleIntegerProperty boilTimeProp = new SimpleIntegerProperty(this.recipe.getBoilTime());
+    boilTimeProp.addListener((observable, oldValue, newValue) -> {
+      recipe.setBoilTime(newValue.intValue());
+    });
+    boilTimeField.textProperty().bindBidirectional(boilTimeProp, new NumberStringConverter());
     final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
-    bindField(bigDecimalConverter, efficiencyField, () -> recipe.getEfficiency(), (val) -> recipe.setEfficiency(val));
-    bindField(bigDecimalConverter, volumeField, () -> recipe.getVolume(), (val) -> recipe.setVolume(val));
+    final SimpleObjectProperty<BigDecimal> efficiencyProp = new SimpleObjectProperty<>(recipe.getEfficiency());
+    efficiencyProp.addListener((observable, oldValue, newValue) -> {
+      recipe.setEfficiency(newValue);
+      colourProp.setValue(calculateColour(recipe));
+      gravityProp.setValue(calculateGravity(recipe));
+      totalWaterProp.setValue(calculateTotalWater(recipe));
+    });
+    efficiencyField.textProperty().bindBidirectional(efficiencyProp, bigDecimalConverter);
+
+    final SimpleObjectProperty<BigDecimal> volumeProp = new SimpleObjectProperty<>(this.recipe.getVolume());
+    volumeProp.addListener((observable, oldValue, newValue) -> {
+      recipe.setVolume(newValue);
+      colourProp.setValue(calculateColour(recipe));
+      gravityProp.setValue(calculateGravity(recipe));
+      totalWaterProp.setValue(calculateTotalWater(recipe));
+    });
+    volumeField.textProperty().bindBidirectional(volumeProp, bigDecimalConverter);
+
     final BigDecimal gravity = calculateGravity(recipe);
     gravityProp = new SimpleObjectProperty<>(gravity);
     gravityProp.addListener((observable, oldValue, newValue) -> {
@@ -119,26 +156,15 @@ public class RecipeController {
     bitternessProp = new SimpleObjectProperty<>(calculateBitterness(recipe, gravity));
     gravityField.textProperty().bindBidirectional(gravityProp, bigDecimalConverter);
     totalWaterProp = new SimpleObjectProperty<>(calculateTotalWater(recipe));
-    fermentableTableController.init(recipe.getFermentableAdditions(), () -> calculateColour(recipe), () -> {
+    colourProp = new SimpleObjectProperty<>(calculateColour(recipe));
+    fermentableTableController.init(recipe.getFermentableAdditions(), () -> {
+      colourProp.setValue(calculateColour(recipe));
       totalWaterProp.set(calculateTotalWater(recipe));
       gravityProp.setValue(calculateGravity(recipe));
-    });
+    }, colourProp);
     hopsTableController.init(recipe.getHopAdditions(), () -> calculateBitterness(recipe, gravity), bitternessProp);
     yeastTableController.init(recipe.getYeastAdditions());
     fillMashTab();
-  }
-
-  private <T> void bindField(StringConverter<T> converter, TextField field, Supplier<T> value, Consumer<T> consumer) {
-    field.textProperty().bindBidirectional(new SimpleObjectProperty<T>(value.get()), converter);
-    field.focusedProperty().addListener(((observable, oldValue, newValue) -> {
-      System.out.println("out change focus");
-      if (!newValue) {
-        final String currentValue = field.textProperty().getValue();
-        if (currentValue != null && !currentValue.isBlank()) {
-          consumer.accept(converter.fromString(currentValue));
-        }
-      }
-    }));
   }
 
   private BigDecimal calculateBitterness(Recipe recipe, BigDecimal gravity) {

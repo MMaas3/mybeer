@@ -22,9 +22,9 @@ import org.mybeer.model.recipe.AdditionMoment;
 import org.mybeer.model.recipe.FermentableAddition;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class FermentableTableController {
@@ -43,14 +43,14 @@ public class FermentableTableController {
   @FXML
   private Button removeButton;
   private Set<FermentableAddition> fermentableAdditions;
-  private Supplier<BigDecimal> calculateColour;
   private Updater recipeUpdater;
+  private SimpleObjectProperty<BigDecimal> colourProp;
 
-  public void init(Set<FermentableAddition> fermentableAdditions, Supplier<BigDecimal> calculateColour,
-                   Updater gravityUpdater) {
+  public void init(Set<FermentableAddition> fermentableAdditions, Updater recipeUpdater,
+                   SimpleObjectProperty<BigDecimal> colourProp) {
+    this.colourProp = colourProp;
     this.fermentableAdditions = fermentableAdditions;
-    this.calculateColour = calculateColour;
-    this.recipeUpdater = gravityUpdater;
+    this.recipeUpdater = recipeUpdater;
     fillColourField();
     fillFermentableComboBox(fermentableBox);
     momentBox.setItems(FXCollections.observableArrayList(AdditionMoment.values()));
@@ -84,7 +84,7 @@ public class FermentableTableController {
 
   private void fillColourField() {
     colourField.textProperty()
-               .bindBidirectional(new SimpleObjectProperty<>(calculateColour.get()), new BigDecimalStringConverter());
+               .bindBidirectional(colourProp, new BigDecimalStringConverter());
   }
 
   private void fillFermentablesTable() {
@@ -137,7 +137,6 @@ public class FermentableTableController {
     this.<FermentableAddition, String>addPropertyColumn("Moment", "additionMoment", this.table, false, false);
 
     table.getItems().addListener((ListChangeListener<FermentableAddition>) c -> {
-      fillColourField();
       recipeUpdater.update();
     });
   }
@@ -145,7 +144,8 @@ public class FermentableTableController {
   private void fillFermentableComboBox(ComboBox<Fermentable> comboBox) {
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final FermentableDao fermentableDao = new FermentableDao();
-      final List<Fermentable> fermentables = fermentableDao.getAll(session).collect(Collectors.toList());
+      final List<Fermentable> fermentables = fermentableDao.getAll(session).sorted(
+          Comparator.comparing(Fermentable::getName)).collect(Collectors.toList());
       comboBox.setItems(FXCollections.observableArrayList(fermentables));
       comboBox.setConverter(new StringConverter<>() {
         @Override
