@@ -10,6 +10,9 @@ import javax.persistence.criteria.Root;
 import java.util.Optional;
 
 public class BeerStyleDao extends GenericDao<BeerStyle> {
+  public BeerStyleDao(){
+    super(BeerStyle.class);
+  }
   public Optional<BeerStyle> findByName(String name) {
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();

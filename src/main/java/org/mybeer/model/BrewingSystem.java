@@ -107,7 +107,7 @@ public class BrewingSystem {
   /**
    * @return evaporationRate in L/h
    */
-  private BigDecimal getEvaporationRate() {
+  public BigDecimal getEvaporationRate() {
     return evaporationRate;
   }
 

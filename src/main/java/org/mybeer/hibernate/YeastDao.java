@@ -8,8 +8,13 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class YeastDao extends GenericDao<Yeast> {
+  public YeastDao() {
+    super(Yeast.class);
+  }
+
   public Optional<Yeast> findByName(String name) {
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();

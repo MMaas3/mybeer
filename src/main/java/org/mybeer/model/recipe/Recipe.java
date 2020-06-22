@@ -52,7 +52,7 @@ public class Recipe {
   @JoinColumn(name = "recipe_id")
   private Set<YeastAddition> yeastAdditions;
   private int oldId;
-  private int efficiency;
+  private BigDecimal efficiency;
   @ManyToOne
   private BeerStyle beerStyle;
   private BigDecimal brewingVolume;
@@ -115,13 +115,9 @@ public class Recipe {
       throw new IllegalArgumentException("Amount should be larger than 0.");
     }
 
-    if (hopAddition.getContactTime() <= 0) {
-      // throw new IllegalArgumentException("ContactTime should be larger than 0.");
-    }
-
     if (hopAddition.getAdditionMoment() == AdditionMoment.BOIL && hopAddition.getContactTime() > boilTime) {
       hopAddition.setContactTime(boilTime);
-      // throw new IllegalArgumentException("ContactTime should be smaller than or equal to the boil time: " + boilTime);
+      throw new IllegalArgumentException("ContactTime should be smaller than or equal to the boil time: " + boilTime);
     }
 
     this.hopAdditions.add(hopAddition);
@@ -248,11 +244,11 @@ public class Recipe {
     return oldId;
   }
 
-  public void setEfficiency(int efficiency) {
+  public void setEfficiency(BigDecimal efficiency) {
     this.efficiency = efficiency;
   }
 
-  public int getEfficiency() {
+  public BigDecimal getEfficiency() {
     return efficiency;
   }
 

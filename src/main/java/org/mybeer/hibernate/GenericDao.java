@@ -2,12 +2,23 @@ package org.mybeer.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+import org.mybeer.model.ingredient.Yeast;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
 public class GenericDao<T> {
+  private Class<T> type;
+
+  public GenericDao(Class<T> type) {
+
+    this.type = type;
+  }
 
   public T save(T objectToSave) {
     try (Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
@@ -44,4 +55,14 @@ public class GenericDao<T> {
     return objectToSave;
   }
 
+  public Stream<T> getAll(Session session) {
+    final CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+
+    final CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(type);
+    final Root<T> root = criteriaQuery.from(type);
+    final CriteriaQuery<T> all = criteriaQuery.select(root);
+
+    final Query<T> query = session.createQuery(all);
+    return query.getResultStream();
+  }
 }

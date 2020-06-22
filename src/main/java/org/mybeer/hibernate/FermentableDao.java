@@ -10,6 +10,10 @@ import javax.persistence.criteria.Root;
 import java.util.Optional;
 
 public class FermentableDao extends GenericDao<Fermentable> {
+  public FermentableDao() {
+    super(Fermentable.class);
+  }
+
 
   public Optional<Fermentable> findByName(String name, Session session) {
     final CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();

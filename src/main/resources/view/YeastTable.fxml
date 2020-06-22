@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane fx:id="yeastTable" prefHeight="301.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.mybeer.view.YeastTableController">
+  <Label layoutX="10" layoutY="14.0" text="Yeast"/>
+  <TableView fx:id="table" layoutX="10" layoutY="35.0" prefHeight="181.0" prefWidth="880.0"/>
+  <Label layoutX="14.0" layoutY="228.0" text="Amount"/>
+  <TextField fx:id="amountField" layoutX="72.0" layoutY="223.0" prefHeight="26.0" prefWidth="69.0"/>
+  <Label layoutX="147.0" layoutY="228.0" text="Yeast"/>
+  <ComboBox fx:id="yeastBox" layoutX="190.0" layoutY="223.0" prefWidth="150.0"/>
+  <Label layoutX="356.0" layoutY="228.0" text="Moment"/>
+  <ComboBox fx:id="momentBox" layoutX="417.0" layoutY="223.0" prefWidth="150.0"/>
+  <Button fx:id="addButton" layoutX="592.0" layoutY="223.0" mnemonicParsing="false" text="Add"/>
+  <Button fx:id="removeButton" layoutX="813.0" layoutY="223.0" mnemonicParsing="false" text="Remove"/>
+</AnchorPane>

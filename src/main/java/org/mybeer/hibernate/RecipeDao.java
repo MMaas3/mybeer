@@ -11,6 +11,9 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class RecipeDao extends GenericDao<Recipe> {
+  public RecipeDao() {
+    super(Recipe.class);
+  }
 
   public Optional<Recipe> getByOldId(int id, Session session) {
     final CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
@@ -21,16 +24,6 @@ public class RecipeDao extends GenericDao<Recipe> {
 
     final Query<Recipe> query = session.createQuery(criteriaQuery);
     return query.getResultStream().findAny();
-  }
-
-  public Stream<Recipe> getAll(Session session) {
-    final CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-
-    final CriteriaQuery<Recipe> criteriaQuery = criteriaBuilder.createQuery(Recipe.class);
-    final Root<Recipe> root = criteriaQuery.from(Recipe.class);
-
-    final Query<Recipe> query = session.createQuery(criteriaQuery);
-    return query.getResultStream();
   }
 
   public Optional<Recipe> getById(Long id, Session session) {

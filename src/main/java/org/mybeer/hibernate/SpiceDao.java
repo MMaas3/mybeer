@@ -10,6 +10,9 @@ import javax.persistence.criteria.Root;
 import java.util.Optional;
 
 public class SpiceDao extends GenericDao<Spice> {
+  public SpiceDao() {
+    super(Spice.class);
+  }
   public Optional<Spice> findByName(String name, Session session) {
     final CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
 

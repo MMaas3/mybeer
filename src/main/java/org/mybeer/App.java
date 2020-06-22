@@ -21,6 +21,7 @@ import org.mybeer.view.RecipeController;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public class App extends Application {
@@ -30,10 +31,9 @@ public class App extends Application {
 
   @Override
   public void start(Stage stage) throws IOException {
+    stage.setScene(createRecipeListScene(stage));
 
-    Scene recipeListScene = createRecipeListScene(stage);
-
-    stage.setScene(recipeListScene);
+    // stage.setScene(createRecipeScene(15L, stage));
     stage.show();
   }
 
@@ -54,19 +54,26 @@ public class App extends Application {
       final Long id = selectedItems.get(0).getId();
       stage.setScene(createRecipeScene(id, stage));
     });
+    final Button newRecipeButton = new Button("New recipe");
+    newRecipeButton.setOnAction(event -> {
+      stage.setScene(createRecipeScene(null, stage));
+    });
+    newRecipeButton.setLayoutX(100.0);
 
     final Pane pane = new Pane();
     pane.getChildren().add(recipeTable);
     pane.getChildren().add(openRecipeButton);
+    pane.getChildren().add(newRecipeButton);
 
     return new Scene(pane);
   }
 
   private Scene createRecipeScene(Long id, Stage stage) {
     final FXMLLoader fxmlLoader = new FXMLLoader();
+    fxmlLoader.setLocation(getClass().getResource("/view/recipe.fxml"));
     AnchorPane recipePane = null;
     try {
-      recipePane = fxmlLoader.load(new FileInputStream("src/main/resources/view/recipe.fxml"));
+      recipePane = fxmlLoader.load();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
