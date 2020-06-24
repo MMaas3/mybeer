@@ -19,6 +19,7 @@ import org.mybeer.hibernate.YeastDao;
 import org.mybeer.model.ingredient.Yeast;
 import org.mybeer.model.ingredient.YeastForm;
 import org.mybeer.model.recipe.AdditionMoment;
+import org.mybeer.model.recipe.HopAddition;
 import org.mybeer.model.recipe.YeastAddition;
 
 import java.math.BigDecimal;
@@ -106,9 +107,21 @@ public class YeastTableController extends AnchorPane {
     yeastColumn.setEditable(true);
     table.getColumns().add(yeastColumn);
 
-    final TableColumn<YeastAddition, String> additionMoment = new TableColumn<>("Addition moment");
-    additionMoment.setCellValueFactory(new PropertyValueFactory<>("additionMoment"));
-    table.getColumns().add(additionMoment);
+    final TableColumn<YeastAddition, ComboBox<AdditionMoment>> momentColumn = new TableColumn<>("Moment");
+    momentColumn.setCellValueFactory(param -> {
+      final YeastAddition yeastAddition = param.getValue();
+      final AdditionMoment additionMoment = yeastAddition.getAdditionMoment();
+      final ComboBox<AdditionMoment> additionMomentComboBox = new ComboBox<>();
+
+      additionMomentComboBox.setItems(FXCollections.observableArrayList(AdditionMoment.values()));
+      additionMomentComboBox.setValue(additionMoment);
+      additionMomentComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+        yeastAddition.setAdditionMoment(newValue);
+      });
+
+      return Bindings.createObjectBinding(() -> additionMomentComboBox);
+    });
+    table.getColumns().add(momentColumn);
 
   }
 

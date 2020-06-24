@@ -14,6 +14,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.StringConverter;
 import javafx.util.converter.BigDecimalStringConverter;
+import javafx.util.converter.IntegerStringConverter;
 import org.hibernate.Session;
 import org.mybeer.hibernate.HopDao;
 import org.mybeer.hibernate.SessionFactorySingleton;
@@ -142,8 +143,34 @@ public class HopsTableController {
     table.getColumns().add(alphaAcidColumn);
 
 
-    this.<HopAddition, String>addPropertyColumn("Moment", "additionMoment", table, true, false);
-    this.<HopAddition, Integer>addPropertyColumn("Contact time", "contactTime", table, true, true);
+    final TableColumn<HopAddition, ComboBox<AdditionMoment>> momentColumn = new TableColumn<>("Moment");
+    momentColumn.setCellValueFactory(param -> {
+      final HopAddition hopAddition = param.getValue();
+      final AdditionMoment additionMoment = hopAddition.getAdditionMoment();
+      final ComboBox<AdditionMoment> additionMomentComboBox = new ComboBox<>();
+
+      additionMomentComboBox.setItems(FXCollections.observableArrayList(AdditionMoment.values()));
+      additionMomentComboBox.setValue(additionMoment);
+      additionMomentComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+        hopAddition.setAdditionMoment(newValue);
+      });
+
+      return Bindings.createObjectBinding(() -> additionMomentComboBox);
+    });
+    table.getColumns().add(momentColumn);
+    final TableColumn<HopAddition, Integer> contactColumn = new TableColumn<>("Contact time");
+    contactColumn.setCellValueFactory(new PropertyValueFactory<>("contactTime"));
+    contactColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+    contactColumn.setOnEditCommit((event -> {
+      final HopAddition hopAddition = event.getTableView().getItems().get(event.getTablePosition().getRow());
+      event.getTableView().getItems().remove(hopAddition);
+      hopAddition.setContactTime(event.getNewValue());
+      event.getTableView().getItems().add(hopAddition);
+    }));
+
+    table.getColumns().add(contactColumn);
+    contactColumn.setComparator(contactColumn.getComparator().reversed());
+    table.getSortOrder().add(contactColumn);
 
     table.getItems().addListener(new ListChangeListener<>() {
       @Override

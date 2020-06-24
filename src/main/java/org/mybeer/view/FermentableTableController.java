@@ -136,7 +136,21 @@ public class FermentableTableController {
         });
     table.getColumns().add(fermentableColourColumn);
 
-    this.<FermentableAddition, String>addPropertyColumn("Moment", "additionMoment", this.table, false, false);
+    final TableColumn<FermentableAddition, ComboBox<AdditionMoment>> momentColumn = new TableColumn<>("Moment");
+    momentColumn.setCellValueFactory(param -> {
+      final FermentableAddition fermentableAddition = param.getValue();
+      final AdditionMoment additionMoment = fermentableAddition.getAdditionMoment();
+      final ComboBox<AdditionMoment> additionMomentComboBox = new ComboBox<>();
+
+      additionMomentComboBox.setItems(FXCollections.observableArrayList(AdditionMoment.values()));
+      additionMomentComboBox.setValue(additionMoment);
+      additionMomentComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+        fermentableAddition.setAdditionMoment(newValue);
+      });
+
+      return Bindings.createObjectBinding(() -> additionMomentComboBox);
+    });
+    this.table.getColumns().add(momentColumn);
 
     table.getItems().addListener((ListChangeListener<FermentableAddition>) c -> {
       recipeUpdater.update();
