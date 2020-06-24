@@ -164,6 +164,9 @@ public class HopsTableController {
       return Bindings.createObjectBinding(() -> additionMomentComboBox);
     });
     table.getColumns().add(momentColumn);
+    momentColumn.setComparator(momentColumn.getComparator().reversed());
+    table.getSortOrder().add(momentColumn);
+
     final TableColumn<HopAddition, Integer> contactColumn = new TableColumn<>("Contact time");
     contactColumn.setCellValueFactory(new PropertyValueFactory<>("contactTime"));
     contactColumn.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
