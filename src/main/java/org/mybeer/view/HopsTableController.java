@@ -4,6 +4,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -85,7 +87,11 @@ public class HopsTableController {
       momentBox.setValue(null);
       final BigDecimal alphaAcid = new BigDecimal(this.alphaAcidField.textProperty().getValue());
       alphaAcidField.textProperty().set("");
-      final int time = Integer.parseInt(this.timeField.textProperty().getValue());
+
+      int time = 0;
+      if (!timeField.textProperty().getValue().isBlank()) {
+        time = Integer.parseInt(this.timeField.textProperty().getValue());
+      }
       timeField.textProperty().set("");
 
       final HopAddition hopAddition = new HopAddition();
