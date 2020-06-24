@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.mybeer.view.AutoCompleteComboBoxListener.addAutoCompleteListener;
+
 public class FermentableTableController {
   @FXML
   private TextField colourField;
@@ -52,7 +54,7 @@ public class FermentableTableController {
     this.fermentableAdditions = fermentableAdditions;
     this.recipeUpdater = recipeUpdater;
     fillColourField();
-    fillFermentableComboBox(fermentableBox);
+    setupFermentableComboBox(fermentableBox);
     momentBox.setItems(FXCollections.observableArrayList(AdditionMoment.values()));
 
     addButton.setOnAction(actionEvent -> {
@@ -112,7 +114,7 @@ public class FermentableTableController {
       final FermentableAddition fermentableAddition = param.getValue();
       final ComboBox<Fermentable> comboBox = new ComboBox<>();
 
-      fillFermentableComboBox(comboBox);
+      setupFermentableComboBox(comboBox);
 
       comboBox.setValue(fermentableAddition.getFermentable());
       comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -141,7 +143,7 @@ public class FermentableTableController {
     });
   }
 
-  private void fillFermentableComboBox(ComboBox<Fermentable> comboBox) {
+  private void setupFermentableComboBox(ComboBox<Fermentable> comboBox) {
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final FermentableDao fermentableDao = new FermentableDao();
       final List<Fermentable> fermentables = fermentableDao.getAll(session).sorted(
@@ -157,9 +159,11 @@ public class FermentableTableController {
         @Override
         public Fermentable fromString(String name) {
           return fermentables.stream().filter(fermentable -> fermentable.getName().equals(name)).findFirst()
-                             .orElseThrow();
+                             .orElse(null);
         }
       });
+
+      addAutoCompleteListener(comboBox, (text) -> fermentable -> fermentable.getName().toLowerCase().contains(text.toLowerCase()));
     }
   }
 

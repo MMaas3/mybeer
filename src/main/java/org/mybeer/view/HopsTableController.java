@@ -27,6 +27,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static org.mybeer.view.AutoCompleteComboBoxListener.addAutoCompleteListener;
+
 public class HopsTableController {
 
   private Set<HopAddition> hopAdditions;
@@ -58,7 +60,7 @@ public class HopsTableController {
     this.calculateBitterness = calculateBitterness;
     this.bitternessProp = bitternessProp;
     bitternessField.textProperty().bindBidirectional(bitternessProp, new BigDecimalStringConverter());
-    fillComboBox(hopsBox);
+    setupComboBox(hopsBox);
     hopsBox.valueProperty().addListener((observable, oldValue, newValue) -> {
       if(newValue != null) {
         alphaAcidField.textProperty().setValue("" + newValue.getAlphaAcidPercentageMax());
@@ -117,7 +119,7 @@ public class HopsTableController {
     hopColumn.setCellValueFactory(param -> {
       final HopAddition addition = param.getValue();
       final ComboBox<Hop> comboBox = new ComboBox<>();
-      fillComboBox(comboBox);
+      setupComboBox(comboBox);
       comboBox.setValue(addition.getHop());
       comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
         table.getItems().remove(addition);
@@ -151,7 +153,7 @@ public class HopsTableController {
     });
   }
 
-  private void fillComboBox(ComboBox<Hop> comboBox) {
+  private void setupComboBox(ComboBox<Hop> comboBox) {
     try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final HopDao hopDao = new HopDao();
       final List<Hop> hops = hopDao.getAll(session).collect(Collectors.toList());
@@ -169,6 +171,7 @@ public class HopsTableController {
         }
       });
     }
+    addAutoCompleteListener(comboBox, (text) -> hop -> hop.getName().toLowerCase().contains(text.toLowerCase()));
   }
 
   private <T, U> void addPropertyColumn(String label, String property, TableView<T> table, boolean orderBy,

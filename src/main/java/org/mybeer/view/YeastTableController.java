@@ -2,7 +2,6 @@ package org.mybeer.view;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -27,6 +26,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.mybeer.view.AutoCompleteComboBoxListener.*;
+
 public class YeastTableController extends AnchorPane {
   @FXML
   private TableView<YeastAddition> table;
@@ -45,7 +46,7 @@ public class YeastTableController extends AnchorPane {
   public void init(Set<YeastAddition> yeastAdditions) {
 
     this.yeastAdditions = yeastAdditions;
-    fillYeastBox(yeastBox);
+    setUpYeastBox(yeastBox);
     momentBox.setItems(FXCollections.observableArrayList(AdditionMoment.values()));
     fillYeastTable();
     addButton.setOnAction((actionEvent) -> {
@@ -94,7 +95,7 @@ public class YeastTableController extends AnchorPane {
     yeastColumn.setCellValueFactory(param -> {
       final Yeast yeast = param.getValue().getYeast();
       final ComboBox<Yeast> comboBox = new ComboBox<>();
-      fillYeastBox(comboBox);
+      setUpYeastBox(comboBox);
       comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
         param.getValue().setYeast(newValue);
       });
@@ -111,7 +112,7 @@ public class YeastTableController extends AnchorPane {
 
   }
 
-  private void fillYeastBox(ComboBox<Yeast> comboBox) {
+  private void setUpYeastBox(ComboBox<Yeast> comboBox) {
     try (Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final List<Yeast> yeasts = new YeastDao().getAll(session).collect(Collectors.toList());
       comboBox.setItems(FXCollections.observableArrayList(yeasts));
@@ -126,6 +127,7 @@ public class YeastTableController extends AnchorPane {
           return yeasts.stream().filter(yeast11 -> yeast11.getName().equals(string)).findAny().orElseThrow();
         }
       });
+      addAutoCompleteListener(comboBox, text -> yeast -> yeast.getName().toLowerCase().contains(text.toLowerCase()));
     }
   }
 
