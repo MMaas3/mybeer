@@ -125,19 +125,22 @@ public class RecipeController {
     });
     descriptionField.textProperty().bindBidirectional(descriptionProp);
     final SimpleIntegerProperty boilTimeProp = new SimpleIntegerProperty(this.recipe.getBoilTime());
-    boilTimeProp.addListener((observable, oldValue, newValue) -> {
-      recipe.setBoilTime(newValue.intValue());
+    final NumberStringConverter numberConverter = new NumberStringConverter();
+    boilTimeField.textProperty().addListener((observable, oldValue, newValue) -> {
+      recipe.setBoilTime(numberConverter.fromString(newValue).intValue());
+      // totalWaterProp.setValue(calculateTotalWater(recipe));
     });
-    boilTimeField.textProperty().bindBidirectional(boilTimeProp, new NumberStringConverter());
+    boilTimeField.textProperty().bindBidirectional(boilTimeProp, numberConverter);
     final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
     final SimpleObjectProperty<BigDecimal> efficiencyProp = new SimpleObjectProperty<>(recipe.getEfficiency());
-    efficiencyProp.addListener((observable, oldValue, newValue) -> {
-      recipe.setEfficiency(newValue);
+
+    efficiencyField.textProperty().bindBidirectional(efficiencyProp, bigDecimalConverter);
+    efficiencyField.textProperty().addListener(((observable, oldValue, newValue) -> {
+      recipe.setEfficiency(bigDecimalConverter.fromString(newValue));
       colourProp.setValue(calculateColour(recipe));
       gravityProp.setValue(calculateGravity(recipe));
       totalWaterProp.setValue(calculateTotalWater(recipe));
-    });
-    efficiencyField.textProperty().bindBidirectional(efficiencyProp, bigDecimalConverter);
+    }));
 
     final SimpleObjectProperty<BigDecimal> volumeProp = new SimpleObjectProperty<>(this.recipe.getVolume());
     volumeProp.addListener((observable, oldValue, newValue) -> {
