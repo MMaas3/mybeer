@@ -20,6 +20,7 @@ import org.mybeer.view.RecipeController;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -86,7 +87,9 @@ public class App extends Application {
   private List<Recipe> recipes() {
     try (Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final RecipeDao recipeDao = new RecipeDao();
-      return recipeDao.getAll(session).collect(Collectors.toList());
+      return recipeDao.getAll(session)
+                      .sorted(Comparator.comparingLong(Recipe::getId).reversed())
+                      .collect(Collectors.toList());
     }
   }
 }
