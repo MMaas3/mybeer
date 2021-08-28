@@ -129,10 +129,12 @@ public class HopsTableController {
       setupComboBox(comboBox);
       comboBox.setValue(addition.getHop());
       comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-        table.getItems().remove(addition);
-        addition.setHop(newValue);
-        addition.setHopsAlphaAcid(newValue.getAlphaAcidPercentageMin());
-        table.getItems().add(addition);
+        if(newValue != null) {
+          table.getItems().remove(addition);
+          addition.setHop(newValue);
+          addition.setHopsAlphaAcid(newValue.getAlphaAcidPercentageMin());
+          table.getItems().add(addition);
+        }
       });
 
       return Bindings.createObjectBinding(() -> comboBox);
