@@ -32,7 +32,7 @@ public class WaterCalculator {
   }
 
   private BigDecimal getMaltLoss(Recipe recipe, BrewingSystem system) {
-    return getFermentableWeightInKg(recipe).multiply(system.getWaterLossMalt());
+    return getGrainWeightInKg(recipe).multiply(system.getWaterLossMalt());
   }
 
   private BigDecimal getHopWeightInKg(Recipe recipe) {
@@ -43,7 +43,7 @@ public class WaterCalculator {
                  .orElse(BigDecimal.ZERO);
   }
 
-  private BigDecimal getFermentableWeightInKg(Recipe recipe) {
+  private BigDecimal getGrainWeightInKg(Recipe recipe) {
     return recipe.getFermentableAdditions().stream()
                  .filter(fa -> fa.getFermentable().getFermentableType() == FermentableType.GRAIN)
                  .map(FermentableAddition::getAmount)
