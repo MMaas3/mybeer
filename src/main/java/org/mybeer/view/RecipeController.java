@@ -12,7 +12,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.StringConverter;
 import javafx.util.converter.BigDecimalStringConverter;
 import javafx.util.converter.NumberStringConverter;
 import org.hibernate.Session;
@@ -34,8 +33,6 @@ import org.mybeer.model.recipe.Recipe;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class RecipeController {
   @FXML
@@ -143,11 +140,16 @@ public class RecipeController {
     }));
 
     final SimpleObjectProperty<BigDecimal> volumeProp = new SimpleObjectProperty<>(this.recipe.getVolume());
-    volumeProp.addListener((observable, oldValue, newValue) -> {
-      recipe.setVolume(newValue);
-      colourProp.setValue(calculateColour(recipe));
-      gravityProp.setValue(calculateGravity(recipe));
-      totalWaterProp.setValue(calculateTotalWater(recipe));
+    volumeField.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (newValue == null) {
+        newValue = "0";
+      }
+      recipe.setVolume(bigDecimalConverter.fromString(newValue));
+      if(colourProp != null && gravityProp != null && totalWaterProp != null) {
+        colourProp.setValue(calculateColour(recipe));
+        gravityProp.setValue(calculateGravity(recipe));
+        totalWaterProp.setValue(calculateTotalWater(recipe));
+      }
     });
     volumeField.textProperty().bindBidirectional(volumeProp, bigDecimalConverter);
 
