@@ -16,6 +16,7 @@ import org.hibernate.Session;
 import org.mybeer.hibernate.RecipeDao;
 import org.mybeer.hibernate.SessionFactorySingleton;
 import org.mybeer.model.recipe.Recipe;
+import org.mybeer.view.OverviewTableViewUtils;
 import org.mybeer.view.RecipeController;
 
 import java.io.FileInputStream;
@@ -43,8 +44,8 @@ public class App extends Application {
     final TableColumn<Recipe, String> nameColumn = new TableColumn<>();
     nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
     recipeTable.getColumns().add(nameColumn);
-    final ObservableList<Recipe> recipes = FXCollections.observableArrayList(recipes());
-    recipeTable.setItems(recipes);
+
+    OverviewTableViewUtils.fillTableWithAllOfType(Recipe.class, recipeTable, Comparator.comparingLong(Recipe::getId).reversed());
 
     final Button openRecipeButton = new Button("Open recipe");
     openRecipeButton.setOnAction(event -> {
@@ -82,14 +83,5 @@ public class App extends Application {
     controller.init(id, event -> stage.setScene(this.createRecipeListScene(stage)));
 
     return new Scene(recipePane);
-  }
-
-  private List<Recipe> recipes() {
-    try (Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
-      final RecipeDao recipeDao = new RecipeDao();
-      return recipeDao.getAll(session)
-                      .sorted(Comparator.comparingLong(Recipe::getId).reversed())
-                      .collect(Collectors.toList());
-    }
   }
 }
