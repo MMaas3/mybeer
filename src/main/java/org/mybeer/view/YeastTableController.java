@@ -11,23 +11,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.StringConverter;
 import javafx.util.converter.BigDecimalStringConverter;
-import org.hibernate.Session;
-import org.mybeer.hibernate.SessionFactorySingleton;
-import org.mybeer.hibernate.YeastDao;
 import org.mybeer.model.ingredient.Yeast;
 import org.mybeer.model.ingredient.YeastForm;
 import org.mybeer.model.recipe.AdditionMoment;
-import org.mybeer.model.recipe.HopAddition;
 import org.mybeer.model.recipe.YeastAddition;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.mybeer.view.AutoCompleteComboBoxListener.*;
 
 public class YeastTableController extends AnchorPane {
   @FXML
@@ -126,22 +117,7 @@ public class YeastTableController extends AnchorPane {
   }
 
   private void setUpYeastBox(ComboBox<Yeast> comboBox) {
-    try (Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
-      final List<Yeast> yeasts = new YeastDao().getAll(session).collect(Collectors.toList());
-      comboBox.setItems(FXCollections.observableArrayList(yeasts));
-      comboBox.setConverter(new StringConverter<>() {
-        @Override
-        public String toString(Yeast object) {
-          return object == null ? "" : object.getName();
-        }
-
-        @Override
-        public Yeast fromString(String string) {
-          return yeasts.stream().filter(yeast11 -> yeast11.getName().equals(string)).findAny().orElseThrow();
-        }
-      });
-      addAutoCompleteListener(comboBox, text -> yeast -> yeast.getName().toLowerCase().contains(text.toLowerCase()));
-    }
+    ComboBoxUtils.setUpComboBoxForEntity(Yeast.class, comboBox, Yeast::getName);
   }
 
 }
