@@ -39,18 +39,19 @@ public class SimpleEntityEditorGenerator {
 
     final StringBuilder stringBuilder = new StringBuilder("package org.mybeer.view;\n\n");
     stringBuilder.append("import javafx.fxml.FXML;\n");
+    final String simpleName = type.getSimpleName();
     List.of(type.getDeclaredFields()).stream().map(SimpleEntityEditorGenerator::getFieldType).distinct()
         .forEach(fieldType -> stringBuilder.append("import javafx.scene.control.").append(fieldType).append(";\n"));
     stringBuilder.append("import javafx.util.converter.BigDecimalStringConverter;\n");
     stringBuilder.append("import javafx.util.converter.NumberStringConverter;\n");
     stringBuilder.append("import ").append(type.getName()).append(";\n");
+    stringBuilder.append("import org.mybeer.hibernate.").append(simpleName).append("Dao;\n");
     List.of(type.getDeclaredFields()).stream()
         .filter(field -> !field.getType().isPrimitive())
         .map(field -> field.getType().getName())
         .filter(fieldType -> !fieldType.startsWith("java.lang"))
         .distinct()
         .forEach(fieldType -> stringBuilder.append("import " + fieldType).append(";\n"));
-    final String simpleName = type.getSimpleName();
     final String className = createControllerName(simpleName);
     stringBuilder.append("\n").append("public class ").append(className).append(" {\n");
     stringBuilder.append("  private ").append(simpleName).append(" ");
@@ -63,12 +64,22 @@ public class SimpleEntityEditorGenerator {
                      .append(createFxId(field)).append(";\n");
       }
     }
+    stringBuilder.append("\n");
 
-    stringBuilder.append("\n").append("  public void init(").append(type.getSimpleName()).append(" ");
-    appendVarName(stringBuilder, simpleName).append(") {\n");
+    stringBuilder.append("  public ").append(simpleName).append("EditorController() {\n");
     stringBuilder.append("    this.");
-    appendVarName(stringBuilder, simpleName).append(" = ");
-    appendVarName(stringBuilder, simpleName).append(";\n");
+    appendVarName(stringBuilder, simpleName).append(" = ").append("new ").append(simpleName).append("();\n");
+    stringBuilder.append("}\n\n");
+
+    stringBuilder.append("  public ").append(simpleName).append("EditorController(Long id) {\n");
+    stringBuilder.append("    this.");
+    appendVarName(stringBuilder, simpleName).append(" = ").append("new ").append(simpleName)
+                                            .append("Dao().getById(id).orElseThrow();\n");
+    stringBuilder.append("}\n\n");
+
+    stringBuilder.append("  @FXML").append("\n");
+    stringBuilder.append("  public void init() {\n");
+
     stringBuilder.append("    final NumberStringConverter numberConverter = new NumberStringConverter();\n");
     stringBuilder
         .append("    final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();\n\n");
@@ -145,7 +156,7 @@ public class SimpleEntityEditorGenerator {
     anchorPane.setAttribute("prefWidth", "1000");
     anchorPane.setAttribute("xmlns", "http://javafx.com/javafx/10.0.2-internal");
     anchorPane.setAttribute("xmlns:fx", "http://javafx.com/fxml/1");
-    anchorPane.setAttribute("fx:controller", "org.mybeer.view." + createControllerName(type.getSimpleName()));
+    // anchorPane.setAttribute("fx:controller", "org.mybeer.view." + createControllerName(type.getSimpleName()));
     document.appendChild(anchorPane);
 
 
