@@ -16,16 +16,24 @@ import java.io.FileWriter;
 
 public class SimpleOverviewGenerator {
   public static void main(String[] args) throws Exception {
-    // createFxml(Fermentable.class, "name");
+    createFxml(Fermentable.class, "name");
     createController(Fermentable.class, "getName");
   }
 
   private static void createController(Class<?> type, String identityPropertyGetter) throws Exception {
     final StringBuilder stringBuilder = new StringBuilder("package org.mybeer.view;\n\n");
+    stringBuilder.append("import javafx.collections.ObservableList;\n");
     stringBuilder.append("import javafx.fxml.FXML;\n");
+    stringBuilder.append("import javafx.fxml.FXMLLoader;\n");
+    stringBuilder.append("import javafx.scene.Node;\n");
+    stringBuilder.append("import javafx.scene.Parent;\n");
+    stringBuilder.append("import javafx.scene.Scene;\n");
     stringBuilder.append("import javafx.scene.control.TableView;\n");
-    stringBuilder.append("import java.util.Comparator;\n");
+    stringBuilder.append("import javafx.scene.control.Button;\n");
+    stringBuilder.append("import javafx.stage.Stage;\n");
     stringBuilder.append("import ").append(type.getName()).append(";\n\n");
+    stringBuilder.append("import java.io.IOException;\n\n");
+    stringBuilder.append("import java.util.Comparator;\n\n");
 
 
     final String controllerName = getControllerName(type);
@@ -33,14 +41,55 @@ public class SimpleOverviewGenerator {
     stringBuilder.append("  @FXML\n");
     final String simpleName = type.getSimpleName();
     stringBuilder.append("  private TableView<").append(simpleName).append("> tableView;\n");
-    stringBuilder.append("  public void init() {\n");
+    stringBuilder.append("  @FXML\n");
+    stringBuilder.append("  private Button openButton;\n");
+    stringBuilder.append("  @FXML\n");
+    stringBuilder.append("  private Button newButton;\n");
+    stringBuilder.append("  @FXML\n");
+    stringBuilder.append("  public void initialize() {\n");
     stringBuilder.append("    OverviewTableViewUtils.fillTableWithAllOfType(").append(simpleName)
                  .append(".class, tableView, Comparator.comparing(").append(simpleName).append("::")
                  .append(identityPropertyGetter).append("));\n");
-    stringBuilder.append("  }");
+    stringBuilder.append("    openButton.setOnAction(event -> {\n");
+    stringBuilder.append("      final ObservableList<").append(simpleName).append("> selectedItems = tableView.getSelectionModel().getSelectedItems();\n");
+    stringBuilder.append("      if (selectedItems.isEmpty()) {\n");
+    stringBuilder.append("        return;\n");
+    stringBuilder.append("      }\n");
+    stringBuilder.append("      final Node source = (Node) event.getSource();\n");
+    stringBuilder.append("      final Stage stage = (Stage) source.getScene().getWindow();\n");
+    stringBuilder.append("      final Long id = selectedItems.get(0).getId();\n");
+    stringBuilder.append("      try {\n");
+    stringBuilder.append("        final FXMLLoader loader = new FXMLLoader();\n");
+    stringBuilder.append("        loader.setLocation(getClass().getClassLoader().getResource(\"view/").append(simpleName).append("Editor.fxml\"));\n");
+    stringBuilder.append("        final ").append(simpleName).append("EditorController editorController = new ").append(simpleName).append("EditorController(id);");
+    stringBuilder.append("\n");
+    stringBuilder.append("        loader.setController(editorController);\n");
+    stringBuilder.append("        final Parent root = loader.load();\n");
+    stringBuilder.append("        stage.setScene(new Scene(root));\n");
+    stringBuilder.append("      } catch (IOException e) {\n");
+    stringBuilder.append("        e.printStackTrace();\n");
+    stringBuilder.append("      }\n");
+    stringBuilder.append("    });\n");
+
+    stringBuilder.append("    newButton.setOnAction(event -> {\n" );
+    stringBuilder.append("        final Node source = (Node) event.getSource();\n" );
+    stringBuilder.append("        final Stage stage = (Stage) source.getScene().getWindow();\n" );
+    stringBuilder.append("        try {\n" );
+    stringBuilder.append("          final FXMLLoader loader = new FXMLLoader();\n" );
+    stringBuilder.append("          loader.setLocation(getClass().getClassLoader().getResource(\"view/").append(simpleName).append("Editor.fxml\"));\n" );
+    stringBuilder.append("        final ").append(simpleName).append("EditorController editorController = new ").append(simpleName).append("EditorController();\n" );
+    stringBuilder.append("          loader.setController(editorController);\n" );
+    stringBuilder.append("          final Parent root = loader.load();\n" );
+    stringBuilder.append("          stage.setScene(new Scene(root));\n" );
+    stringBuilder.append("        } catch (IOException e) {\n" );
+    stringBuilder.append("          e.printStackTrace();\n" );
+    stringBuilder.append("        }\n" );
+    stringBuilder.append("      });\n");
+
+    stringBuilder.append("  }\n");
     stringBuilder.append("}");
 
-    final File file = new File("src/main/java/org/mybeer/view/" + controllerName + ".java");
+    final File file = new File("src/main/java/org/mybeer/view/"+ controllerName+ ".java");
     System.out.println(file.getAbsolutePath());
     try (final FileWriter fileWriter = new FileWriter(file)) {
       fileWriter.append(stringBuilder.toString());
@@ -60,6 +109,7 @@ public class SimpleOverviewGenerator {
     document.appendChild(document.createProcessingInstruction("import", "javafx.scene.control.TableColumn"));
     document.appendChild(document.createProcessingInstruction("import", "javafx.scene.control.TableView"));
     document.appendChild(document.createProcessingInstruction("import", "javafx.scene.layout.AnchorPane"));
+    document.appendChild(document.createProcessingInstruction("import", "javafx.scene.control.Button"));
 
     final Element anchorPane = document.createElement("AnchorPane");
     anchorPane.setAttribute("prefHeight", "1000");
@@ -69,8 +119,23 @@ public class SimpleOverviewGenerator {
     anchorPane.setAttribute("fx:controller", "org.mybeer.view." + getControllerName(type));
     document.appendChild(anchorPane);
 
+    final Element openButton = document.createElement("Button");
+    openButton.setAttribute("fx:id","openButton");
+    openButton.setAttribute("layoutX","14");
+    openButton.setAttribute("text", "Open " + type.getSimpleName());
+    anchorPane.appendChild(openButton);
+
+    final Element newButton = document.createElement("Button");
+    newButton.setAttribute("fx:id","newButton");
+    newButton.setAttribute("layoutX","214");
+    newButton.setAttribute("text", "New " + type.getSimpleName());
+    anchorPane.appendChild(newButton);
+
     final Element tableView = document.createElement("TableView");
     tableView.setAttribute("fx:id", "tableView");
+    tableView.setAttribute("layoutX","14");
+    tableView.setAttribute("layoutY", "30");
+    tableView.setAttribute("prefWidth", "500");
     anchorPane.appendChild(tableView);
 
     final Element columns = document.createElement("columns");
@@ -87,7 +152,7 @@ public class SimpleOverviewGenerator {
     final Element items = document.createElement("items");
     tableView.appendChild(items);
     final Element fxCollection = document.createElement("FXCollections");
-    fxCollection.setAttribute("fx:factory", "observableList");
+    fxCollection.setAttribute("fx:factory", "observableArrayList");
     items.appendChild(fxCollection);
 
 
