@@ -38,10 +38,16 @@ public class SimpleEntityEditorGenerator {
 
 
     final StringBuilder stringBuilder = new StringBuilder("package org.mybeer.view;\n\n");
-    stringBuilder.append("import javafx.fxml.FXML;\n");
     final String simpleName = type.getSimpleName();
+    stringBuilder.append("import javafx.fxml.FXML;\n");
+    stringBuilder.append("import javafx.fxml.FXMLLoader;\n");
+    stringBuilder.append("import javafx.scene.Node;\n");
+    stringBuilder.append("import javafx.scene.Parent;\n");
+    stringBuilder.append("import javafx.scene.Scene;\n");
+    stringBuilder.append("import javafx.scene.control.Button;\n");
     List.of(type.getDeclaredFields()).stream().map(SimpleEntityEditorGenerator::getFieldType).distinct()
         .forEach(fieldType -> stringBuilder.append("import javafx.scene.control.").append(fieldType).append(";\n"));
+    stringBuilder.append("import javafx.stage.Stage;\n");
     stringBuilder.append("import javafx.util.converter.BigDecimalStringConverter;\n");
     stringBuilder.append("import javafx.util.converter.NumberStringConverter;\n");
     stringBuilder.append("import ").append(type.getName()).append(";\n");
@@ -52,15 +58,20 @@ public class SimpleEntityEditorGenerator {
         .filter(fieldType -> !fieldType.startsWith("java.lang"))
         .distinct()
         .forEach(fieldType -> stringBuilder.append("import " + fieldType).append(";\n"));
+    stringBuilder.append("import java.io.IOException;\n\n");
     final String className = createControllerName(simpleName);
     stringBuilder.append("\n").append("public class ").append(className).append(" {\n");
     stringBuilder.append("  private ").append(simpleName).append(" ");
     appendVarName(stringBuilder, simpleName).append(";")
                                             .append("\n");
+    stringBuilder.append("  @FXML\n");
+    stringBuilder.append("  private Button backButton;\n");
+    stringBuilder.append("  @FXML\n");
+    stringBuilder.append("  private Button saveButton;\n");
     for (Field field : type.getDeclaredFields()) {
       if (!Modifier.isStatic(field.getModifiers())) {
         stringBuilder.append("  @FXML\n");
-        stringBuilder.append("  private ").append(getFieldType(field)).append(" ")
+        stringBuilder.append("  private ").append(getFieldTypeForController(field)).append(" ")
                      .append(createFxId(field)).append(";\n");
       }
     }
@@ -78,7 +89,24 @@ public class SimpleEntityEditorGenerator {
     stringBuilder.append("}\n\n");
 
     stringBuilder.append("  @FXML").append("\n");
-    stringBuilder.append("  public void init() {\n");
+    stringBuilder.append("  public void initialize() {\n");
+
+    stringBuilder.append("    backButton.setOnAction(event -> {\n");
+    stringBuilder.append("        final Node source = (Node) event.getSource();\n");
+    stringBuilder.append("        final Stage stage = (Stage) source.getScene().getWindow();\n");
+    stringBuilder.append("        try {\n");
+    stringBuilder.append("          final FXMLLoader loader = new FXMLLoader();\n");
+    stringBuilder.append("          loader.setLocation(getClass().getClassLoader().getResource(\"view/")
+                 .append(simpleName).append("Overview.fxml\"));\n");
+    stringBuilder.append("          final Parent root = loader.load();\n");
+    stringBuilder.append("          stage.setScene(new Scene(root));\n");
+    stringBuilder.append("        } catch (IOException e) {\n");
+    stringBuilder.append("          e.printStackTrace();\n");
+    stringBuilder.append("        }\n");
+    stringBuilder.append("      });\n");
+
+    stringBuilder.append("    saveButton.setOnAction(event -> new ").append(simpleName).append("Dao().save(");
+    appendVarName(stringBuilder, simpleName).append("));\n");
 
     stringBuilder.append("    final NumberStringConverter numberConverter = new NumberStringConverter();\n");
     stringBuilder
@@ -86,6 +114,9 @@ public class SimpleEntityEditorGenerator {
     for (Field field : type.getDeclaredFields()) {
       if (!Modifier.isStatic(field.getModifiers())) {
         if (getFieldType(field).equals("TextField")) {
+          stringBuilder.append("    ").append(createFxId(field)).append(".textProperty().setValue(\"\" + ");
+          appendVarName(stringBuilder, simpleName).append(".get").append(field.getName().substring(0, 1).toUpperCase())
+                                                  .append(field.getName().substring(1)).append("());\n");
           stringBuilder.append("    ").append(createFxId(field))
                        .append(".textProperty().addListener((observable, oldValue, newValue) -> {\n");
           stringBuilder.append("      ");
@@ -109,6 +140,9 @@ public class SimpleEntityEditorGenerator {
                        .append(createFxId(field)).append(", ");
           appendVarName(stringBuilder, field.getType().getSimpleName()).append(" -> ");
           appendVarName(stringBuilder, field.getType().getSimpleName()).append(".name()").append(");\n\n");
+          stringBuilder.append("    ").append(createFxId(field)).append(".setValue(");
+          appendVarName(stringBuilder, simpleName).append(".get").append(field.getName().substring(0, 1).toUpperCase())
+                                                  .append(field.getName().substring(1)).append("());\n");
         }
 
       }
@@ -125,6 +159,15 @@ public class SimpleEntityEditorGenerator {
       fileWriter.append(stringBuilder.toString());
     }
     System.out.println(stringBuilder);
+  }
+
+  private static String getFieldTypeForController(Field field) {
+    final String fieldType = getFieldType(field);
+    if (fieldType.equals("ComboBox")) {
+      return fieldType + "<" + field.getType().getSimpleName() + ">";
+    } else {
+      return fieldType;
+    }
   }
 
   private static String createControllerName(String simpleName) {
@@ -161,6 +204,21 @@ public class SimpleEntityEditorGenerator {
 
 
     int labelY = 14;
+    final Element backButton = document.createElement("Button");
+    backButton.setAttribute("fx:id", "backButton");
+    backButton.setAttribute("layoutX", "10");
+    backButton.setAttribute("layoutY", "" + (labelY - 5));
+    backButton.setAttribute("text", "Back");
+    anchorPane.appendChild(backButton);
+
+    final Element saveButton = document.createElement("Button");
+    saveButton.setAttribute("fx:id", "saveButton");
+    saveButton.setAttribute("layoutX", "200");
+    saveButton.setAttribute("layoutY", "" + (labelY - 5));
+    saveButton.setAttribute("text", "Save");
+    anchorPane.appendChild(saveButton);
+    labelY += 30;
+
     for (Field field : type.getDeclaredFields()) {
       if (!Modifier.isStatic(field.getModifiers())) {
         final Element label = document.createElement("Label");
