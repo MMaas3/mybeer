@@ -1,9 +1,9 @@
 package org.mybeer;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
@@ -12,19 +12,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import org.hibernate.Session;
-import org.mybeer.hibernate.RecipeDao;
-import org.mybeer.hibernate.SessionFactorySingleton;
 import org.mybeer.model.recipe.Recipe;
 import org.mybeer.view.OverviewTableViewUtils;
 import org.mybeer.view.RecipeController;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 public class App extends Application {
   public static void main(String[] args) {
@@ -33,10 +26,22 @@ public class App extends Application {
 
   @Override
   public void start(Stage stage) throws IOException {
-    stage.setScene(createRecipeListScene(stage));
-
+    // stage.setScene(createRecipeListScene(stage));
+    stage.setScene(fermetableOveviewScene());
     // stage.setScene(createRecipeScene(15L, stage));
     stage.show();
+  }
+
+  private Scene fermetableOveviewScene() {
+    final FXMLLoader fxmlLoader = new FXMLLoader();
+    fxmlLoader.setLocation(getClass().getResource("/view/FermentableOverview.fxml"));
+    Parent fermetableOverview = null;
+    try {
+      fermetableOverview = fxmlLoader.load();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return new Scene(fermetableOverview);
   }
 
   private Scene createRecipeListScene(Stage stage) {
@@ -80,6 +85,9 @@ public class App extends Application {
       throw new RuntimeException(e);
     }
     RecipeController controller = fxmlLoader.getController();
+
+    // TODO find a better way to pass data between scenes:
+    // https://dev.to/devtony101/javafx-3-ways-of-passing-information-between-scenes-1bm8
     controller.init(id, event -> stage.setScene(this.createRecipeListScene(stage)));
 
     return new Scene(recipePane);
