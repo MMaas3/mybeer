@@ -149,41 +149,53 @@ public class SimpleOverviewGenerator {
         .appendChild(document.createProcessingInstruction("import", "javafx.scene.control.cell.PropertyValueFactory"));
     document.appendChild(document.createProcessingInstruction("import", "javafx.scene.control.TableColumn"));
     document.appendChild(document.createProcessingInstruction("import", "javafx.scene.control.TableView"));
-    document.appendChild(document.createProcessingInstruction("import", "javafx.scene.layout.AnchorPane"));
+    document.appendChild(document.createProcessingInstruction("import", "javafx.scene.layout.BorderPane"));
+    document.appendChild(document.createProcessingInstruction("import", "javafx.scene.layout.VBox"));
     document.appendChild(document.createProcessingInstruction("import", "javafx.scene.control.Button"));
 
-    final Element anchorPane = document.createElement("AnchorPane");
-    anchorPane.setAttribute("prefHeight", "1000");
-    anchorPane.setAttribute("prefWidth", "1000");
-    anchorPane.setAttribute("xmlns", "http://javafx.com/javafx/10.0.2-internal");
-    anchorPane.setAttribute("xmlns:fx", "http://javafx.com/fxml/1");
-    anchorPane.setAttribute("fx:controller", "org.mybeer.view." + getControllerName(type));
-    document.appendChild(anchorPane);
+    final Element root = document.createElement("BorderPane");
+    root.setAttribute("prefHeight", "1000");
+    root.setAttribute("prefWidth", "1000");
+    root.setAttribute("xmlns", "http://javafx.com/javafx/10.0.2-internal");
+    root.setAttribute("xmlns:fx", "http://javafx.com/fxml/1");
+    root.setAttribute("fx:controller", "org.mybeer.view." + getControllerName(type));
+    root.setAttribute("style", "-fx-padding: 10 10 10 10;");
+    document.appendChild(root);
+
+    final Element right = document.createElement("right");
+    root.appendChild(right);
+    final Element buttons = document.createElement("VBox");
+    buttons.setAttribute("spacing", "10");
+    buttons.setAttribute("style", "-fx-padding: 0 0 0 10;");
+    right.appendChild(buttons);
 
     final Element openButton = document.createElement("Button");
     openButton.setAttribute("fx:id", "openButton");
     openButton.setAttribute("layoutX", "14");
     openButton.setAttribute("text", "Open " + type.getSimpleName());
-    anchorPane.appendChild(openButton);
+    buttons.appendChild(openButton);
 
     final Element newButton = document.createElement("Button");
     newButton.setAttribute("fx:id", "newButton");
     newButton.setAttribute("layoutX", "214");
     newButton.setAttribute("text", "New " + type.getSimpleName());
-    anchorPane.appendChild(newButton);
+    buttons.appendChild(newButton);
 
     final Element cloneButton = document.createElement("Button");
     cloneButton.setAttribute("fx:id", "cloneButton");
     cloneButton.setAttribute("layoutX", "414");
     cloneButton.setAttribute("text", "Clone " + type.getSimpleName());
-    anchorPane.appendChild(cloneButton);
+    buttons.appendChild(cloneButton);
+
+    final Element center = document.createElement("center");
+    root.appendChild(center);
 
     final Element tableView = document.createElement("TableView");
     tableView.setAttribute("fx:id", "tableView");
     tableView.setAttribute("layoutX", "14");
     tableView.setAttribute("layoutY", "30");
     tableView.setAttribute("prefWidth", "500");
-    anchorPane.appendChild(tableView);
+    center.appendChild(tableView);
 
     final Element columns = document.createElement("columns");
     tableView.appendChild(columns);
