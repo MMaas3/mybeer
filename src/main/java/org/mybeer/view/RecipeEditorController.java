@@ -34,7 +34,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
 
-public class RecipeController {
+public class RecipeEditorController {
   @FXML
   private TextField nameField;
   @FXML
@@ -73,6 +73,13 @@ public class RecipeController {
   private SimpleObjectProperty<BigDecimal> totalWaterProp;
   private SimpleObjectProperty<BigDecimal> colourProp;
 
+  public RecipeEditorController(Long id) {
+    this.recipe = new RecipeDao().getById(id).orElseThrow();
+  }
+
+  public RecipeEditorController() {
+    this.recipe = new Recipe();
+  }
 
   public void init(Long recipeId, EventHandler<ActionEvent> backAction) {
     this.backButton.setOnAction(backAction);

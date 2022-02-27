@@ -82,17 +82,17 @@ public class HopEditorController {
   @FXML
   public void initialize() {
     backButton.setOnAction(event -> {
-        final Node source = (Node) event.getSource();
-        final Stage stage = (Stage) source.getScene().getWindow();
-        try {
-          final FXMLLoader loader = new FXMLLoader();
-          loader.setLocation(getClass().getClassLoader().getResource("view/HopOverview.fxml"));
-          final Parent root = loader.load();
-          stage.setScene(new Scene(root));
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      });
+      final Node source = (Node) event.getSource();
+      final Stage stage = (Stage) source.getScene().getWindow();
+      try {
+        final FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getClassLoader().getResource("view/HopOverview.fxml"));
+        final Parent root = loader.load();
+        stage.setScene(new Scene(root));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    });
     saveButton.setOnAction(event -> new HopDao().save(hop));
     final NumberStringConverter numberConverter = new NumberStringConverter();
     final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();

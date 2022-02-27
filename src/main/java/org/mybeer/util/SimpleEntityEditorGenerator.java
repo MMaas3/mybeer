@@ -98,18 +98,18 @@ public class SimpleEntityEditorGenerator {
     stringBuilder.append("  public void initialize() {\n");
 
     stringBuilder.append("    backButton.setOnAction(event -> {\n");
-    stringBuilder.append("        final Node source = (Node) event.getSource();\n");
-    stringBuilder.append("        final Stage stage = (Stage) source.getScene().getWindow();\n");
-    stringBuilder.append("        try {\n");
-    stringBuilder.append("          final FXMLLoader loader = new FXMLLoader();\n");
-    stringBuilder.append("          loader.setLocation(getClass().getClassLoader().getResource(\"view/")
+    stringBuilder.append("      final Node source = (Node) event.getSource();\n");
+    stringBuilder.append("      final Stage stage = (Stage) source.getScene().getWindow();\n");
+    stringBuilder.append("      try {\n");
+    stringBuilder.append("        final FXMLLoader loader = new FXMLLoader();\n");
+    stringBuilder.append("        loader.setLocation(getClass().getClassLoader().getResource(\"view/")
                  .append(simpleName).append("Overview.fxml\"));\n");
-    stringBuilder.append("          final Parent root = loader.load();\n");
-    stringBuilder.append("          stage.setScene(new Scene(root));\n");
-    stringBuilder.append("        } catch (IOException e) {\n");
-    stringBuilder.append("          e.printStackTrace();\n");
-    stringBuilder.append("        }\n");
-    stringBuilder.append("      });\n");
+    stringBuilder.append("        final Parent root = loader.load();\n");
+    stringBuilder.append("        stage.setScene(new Scene(root));\n");
+    stringBuilder.append("      } catch (IOException e) {\n");
+    stringBuilder.append("        e.printStackTrace();\n");
+    stringBuilder.append("      }\n");
+    stringBuilder.append("    });\n");
 
     stringBuilder.append("    saveButton.setOnAction(event -> new ").append(simpleName).append("Dao().save(");
     appendVarName(stringBuilder, simpleName).append("));\n");
