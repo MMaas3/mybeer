@@ -19,7 +19,7 @@ import java.util.Objects;
 public class Yeast {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
+  private Long id;
 
   private String name;
   @Enumerated(EnumType.STRING)
@@ -192,5 +192,13 @@ public class Yeast {
 
   public String getRemarks() {
     return remarks;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 }
