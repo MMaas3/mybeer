@@ -24,6 +24,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -290,5 +291,12 @@ public class Recipe {
 
   public void addSpiceAddition(SpiceAddition spiceAddition) {
     this.spiceAdditions.add(spiceAddition);
+  }
+
+  public Set<SpiceAddition> getSpiceAdditions(){
+    return this.spiceAdditions;
+  }
+  public void setSpiceAdditions(Set<SpiceAddition> spiceAdditions) {
+    this.spiceAdditions = spiceAdditions;
   }
 }

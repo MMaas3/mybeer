@@ -6,6 +6,7 @@ package org.mybeer.model.mash;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,7 +24,7 @@ public class MashScheme {
 
   private BigDecimal grainTemperature;
   private BigDecimal maltWeight;
-  @OneToMany(cascade = CascadeType.ALL, targetEntity = MashStep.class, mappedBy = "mashScheme")
+  @OneToMany(cascade = CascadeType.ALL, targetEntity = MashStep.class, mappedBy = "mashScheme", fetch = FetchType.EAGER)
   private List<MashStep> mashSteps;
   private BigDecimal mashWater;
   private String name;

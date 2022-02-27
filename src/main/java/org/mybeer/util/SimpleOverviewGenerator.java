@@ -5,6 +5,7 @@ import org.mybeer.model.ingredient.Fermentable;
 import org.mybeer.model.ingredient.Hop;
 import org.mybeer.model.ingredient.Spice;
 import org.mybeer.model.ingredient.Yeast;
+import org.mybeer.model.recipe.Recipe;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -24,6 +25,7 @@ public class SimpleOverviewGenerator {
     createOverview(Hop.class, "name", "getName");
     createOverview(Yeast.class, "name", "getName");
     createOverview(Spice.class, "name", "getName");
+    createOverview(Recipe.class, "name", "getName");
   }
 
   private static void createOverview(Class<?> type, String identityProperty, String identityPropertyGetter) throws Exception {

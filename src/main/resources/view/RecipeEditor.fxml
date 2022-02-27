@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <AnchorPane prefHeight="1000" prefWidth="1000" xmlns="http://javafx.com/javafx/10.0.2-internal"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.mybeer.view.RecipeController">
+            xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <Button fx:id="backButton" layoutX="50">Back</Button>
     <Button fx:id="saveButton" layoutX="250.0" mnemonicParsing="false" text="Save"/>

@@ -7,13 +7,19 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import javafx.util.converter.BigDecimalStringConverter;
 import javafx.util.converter.NumberStringConverter;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.mybeer.calculator.GravityCalculator;
@@ -30,6 +36,7 @@ import org.mybeer.model.mash.MashScheme;
 import org.mybeer.model.mash.MashStep;
 import org.mybeer.model.recipe.Recipe;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
@@ -74,15 +81,35 @@ public class RecipeEditorController {
   private SimpleObjectProperty<BigDecimal> colourProp;
 
   public RecipeEditorController(Long id) {
-    this.recipe = new RecipeDao().getById(id).orElseThrow();
+    try(final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
+      final Transaction transaction = session.beginTransaction();
+      this.recipe = new RecipeDao().getById(session, id).orElseThrow();
+      Hibernate.initialize(recipe.getFermentableAdditions());
+      Hibernate.initialize(recipe.getHopAdditions());
+      Hibernate.initialize(recipe.getSpiceAdditions());
+      Hibernate.initialize(recipe.getYeastAdditions());
+      transaction.commit();
+    }
   }
 
   public RecipeEditorController() {
-    this.recipe = new Recipe();
+    this.recipe = newRecipe();
   }
 
-  public void init(Long recipeId, EventHandler<ActionEvent> backAction) {
-    this.backButton.setOnAction(backAction);
+  @FXML
+  public void initialize() {
+    this.backButton.setOnAction(event -> {
+      final Node source = (Node) event.getSource();
+      final Stage stage = (Stage) source.getScene().getWindow();
+      try {
+        final FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getClassLoader().getResource("view/RecipeOverview.fxml"));
+        final Parent root = loader.load();
+        stage.setScene(new Scene(root));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    });
     this.saveButton.setOnAction((actionEvent) -> {
       try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
         final RecipeDao recipeDao = new RecipeDao();
@@ -92,22 +119,10 @@ public class RecipeEditorController {
       }
     });
 
-    try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
-      if (recipeId != null) {
-        final Optional<Recipe> recipeOptional = new RecipeDao().getById(recipeId, session);
-        if (recipeOptional.isEmpty()) {
-          throw new RuntimeException("Recipe does not exist");
-        }
-
-        this.recipe = recipeOptional.orElse(newRecipe(session));
-      } else {
-        this.recipe = newRecipe(session);
-      }
-      populateForm();
-    }
+    populateForm();
   }
 
-  private Recipe newRecipe(Session session) {
+  private Recipe newRecipe() {
     final Recipe recipe = new Recipe();
     final BrewingSystem brewingSystem = new BrewingSystemDao().findByName("Maas Pico Brouwerij").get();
     recipe.setSystem(brewingSystem);
