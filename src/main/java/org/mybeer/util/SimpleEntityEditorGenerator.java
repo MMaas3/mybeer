@@ -1,6 +1,9 @@
 package org.mybeer.util;
 
 import org.mybeer.model.ingredient.Fermentable;
+import org.mybeer.model.ingredient.Hop;
+import org.mybeer.model.ingredient.Spice;
+import org.mybeer.model.ingredient.Yeast;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ProcessingInstruction;
@@ -26,12 +29,15 @@ import java.util.List;
 public class SimpleEntityEditorGenerator {
 
   public static void main(String[] args) throws ParserConfigurationException, TransformerException, IOException {
+    createEditor(Fermentable.class);
+    createEditor(Hop.class);
+    createEditor(Yeast.class);
+    createEditor(Spice.class);
+  }
 
-    createFxml(Fermentable.class);
-    // createFxml(Hop.class);
-
-    createController(Fermentable.class);
-
+  private static void createEditor(Class<?> type) throws ParserConfigurationException, IOException, TransformerException {
+    createFxml(type);
+    createController(type);
   }
 
   private static void createController(Class<?> type) throws IOException {

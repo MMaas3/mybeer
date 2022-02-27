@@ -2,6 +2,9 @@ package org.mybeer.util;
 
 import org.mybeer.hibernate.GenericDao;
 import org.mybeer.model.ingredient.Fermentable;
+import org.mybeer.model.ingredient.Hop;
+import org.mybeer.model.ingredient.Spice;
+import org.mybeer.model.ingredient.Yeast;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -17,8 +20,15 @@ import java.io.FileWriter;
 
 public class SimpleOverviewGenerator {
   public static void main(String[] args) throws Exception {
-    createFxml(Fermentable.class, "name");
-    createController(Fermentable.class, "getName");
+    createOverview(Fermentable.class, "name", "getName");
+    createOverview(Hop.class, "name", "getName");
+    createOverview(Yeast.class, "name", "getName");
+    createOverview(Spice.class, "name", "getName");
+  }
+
+  private static void createOverview(Class<?> type, String identityProperty, String identityPropertyGetter) throws Exception {
+    createFxml(type, identityProperty);
+    createController(type, identityPropertyGetter);
   }
 
   private static void createController(Class<?> type, String identityPropertyGetter) throws Exception {
@@ -171,21 +181,23 @@ public class SimpleOverviewGenerator {
 
     final Element openButton = document.createElement("Button");
     openButton.setAttribute("fx:id", "openButton");
-    openButton.setAttribute("layoutX", "14");
     openButton.setAttribute("text", "Open " + type.getSimpleName());
     buttons.appendChild(openButton);
 
     final Element newButton = document.createElement("Button");
     newButton.setAttribute("fx:id", "newButton");
-    newButton.setAttribute("layoutX", "214");
     newButton.setAttribute("text", "New " + type.getSimpleName());
     buttons.appendChild(newButton);
 
     final Element cloneButton = document.createElement("Button");
     cloneButton.setAttribute("fx:id", "cloneButton");
-    cloneButton.setAttribute("layoutX", "414");
     cloneButton.setAttribute("text", "Clone " + type.getSimpleName());
     buttons.appendChild(cloneButton);
+
+    final Element deleteButton = document.createElement("Button");
+    deleteButton.setAttribute("fx:id", "deleteButton");
+    deleteButton.setAttribute("text", "Delete " + type.getSimpleName());
+    buttons.appendChild(deleteButton);
 
     final Element center = document.createElement("center");
     root.appendChild(center);
