@@ -57,7 +57,7 @@ public class FermentableOverviewController {
       try {
         final FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getClassLoader().getResource("view/FermentableEditor.fxml"));
-      final FermentableEditorController editorController = new FermentableEditorController();
+        final FermentableEditorController editorController = new FermentableEditorController();
         loader.setController(editorController);
         final Parent root = loader.load();
         stage.setScene(new Scene(root));

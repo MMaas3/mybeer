@@ -57,7 +57,7 @@ public class HopOverviewController {
       try {
         final FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getClassLoader().getResource("view/HopEditor.fxml"));
-      final HopEditorController editorController = new HopEditorController();
+        final HopEditorController editorController = new HopEditorController();
         loader.setController(editorController);
         final Parent root = loader.load();
         stage.setScene(new Scene(root));

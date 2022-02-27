@@ -57,7 +57,7 @@ public class SpiceOverviewController {
       try {
         final FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getClassLoader().getResource("view/SpiceEditor.fxml"));
-      final SpiceEditorController editorController = new SpiceEditorController();
+        final SpiceEditorController editorController = new SpiceEditorController();
         loader.setController(editorController);
         final Parent root = loader.load();
         stage.setScene(new Scene(root));

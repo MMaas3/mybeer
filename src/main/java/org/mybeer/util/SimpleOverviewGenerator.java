@@ -96,7 +96,7 @@ public class SimpleOverviewGenerator {
     stringBuilder.append("        final FXMLLoader loader = new FXMLLoader();\n");
     stringBuilder.append("        loader.setLocation(getClass().getClassLoader().getResource(\"view/")
                  .append(simpleName).append("Editor.fxml\"));\n");
-    stringBuilder.append("      final ").append(simpleName).append("EditorController editorController = new ")
+    stringBuilder.append("        final ").append(simpleName).append("EditorController editorController = new ")
                  .append(simpleName).append("EditorController();\n");
     stringBuilder.append("        loader.setController(editorController);\n");
     stringBuilder.append("        final Parent root = loader.load();\n");

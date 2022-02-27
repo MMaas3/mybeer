@@ -57,7 +57,7 @@ public class YeastOverviewController {
       try {
         final FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getClassLoader().getResource("view/YeastEditor.fxml"));
-      final YeastEditorController editorController = new YeastEditorController();
+        final YeastEditorController editorController = new YeastEditorController();
         loader.setController(editorController);
         final Parent root = loader.load();
         stage.setScene(new Scene(root));
