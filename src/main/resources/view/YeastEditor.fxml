@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?import javafx.scene.control.*?><?import javafx.scene.layout.*?><AnchorPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" prefHeight="1000" prefWidth="1000">
+    <Button fx:id="backButton" layoutX="10" layoutY="9" text="Back"/>
+    <Button fx:id="saveButton" layoutX="200" layoutY="9" text="Save"/>
+    <Label layoutX="10" layoutY="44" text="Id"/>
+    <TextField fx:id="idTextField" layoutX="200" layoutY="39" prefWidth="200"/>
+    <Label layoutX="10" layoutY="74" text="Name"/>
+    <TextField fx:id="nameTextField" layoutX="200" layoutY="69" prefWidth="200"/>
+    <Label layoutX="10" layoutY="104" text="Form"/>
+    <ComboBox fx:id="formComboBox" layoutX="200" layoutY="99" prefWidth="200"/>
+    <Label layoutX="10" layoutY="134" text="Type"/>
+    <ComboBox fx:id="typeComboBox" layoutX="200" layoutY="129" prefWidth="200"/>
+    <Label layoutX="10" layoutY="164" text="Old Id"/>
+    <TextField fx:id="oldIdTextField" layoutX="200" layoutY="159" prefWidth="200"/>
+    <Label layoutX="10" layoutY="194" text="Attenuation Min"/>
+    <TextField fx:id="attenuationMinTextField" layoutX="200" layoutY="189" prefWidth="200"/>
+    <Label layoutX="10" layoutY="224" text="Attenuation Max"/>
+    <TextField fx:id="attenuationMaxTextField" layoutX="200" layoutY="219" prefWidth="200"/>
+    <Label layoutX="10" layoutY="254" text="Temp Min"/>
+    <TextField fx:id="tempMinTextField" layoutX="200" layoutY="249" prefWidth="200"/>
+    <Label layoutX="10" layoutY="284" text="Temp Max"/>
+    <TextField fx:id="tempMaxTextField" layoutX="200" layoutY="279" prefWidth="200"/>
+    <Label layoutX="10" layoutY="314" text="Alcohol Tolerance Min"/>
+    <TextField fx:id="alcoholToleranceMinTextField" layoutX="200" layoutY="309" prefWidth="200"/>
+    <Label layoutX="10" layoutY="344" text="Alcohol Tolerance Max"/>
+    <TextField fx:id="alcoholToleranceMaxTextField" layoutX="200" layoutY="339" prefWidth="200"/>
+    <Label layoutX="10" layoutY="374" text="Dose Min"/>
+    <TextField fx:id="doseMinTextField" layoutX="200" layoutY="369" prefWidth="200"/>
+    <Label layoutX="10" layoutY="404" text="Dose Max"/>
+    <TextField fx:id="doseMaxTextField" layoutX="200" layoutY="399" prefWidth="200"/>
+    <Label layoutX="10" layoutY="434" text="Flocculation"/>
+    <ComboBox fx:id="flocculationComboBox" layoutX="200" layoutY="429" prefWidth="200"/>
+    <Label layoutX="10" layoutY="464" text="Styles"/>
+    <TextField fx:id="stylesTextField" layoutX="200" layoutY="459" prefWidth="200"/>
+    <Label layoutX="10" layoutY="494" text="Aroma Taste"/>
+    <TextField fx:id="aromaTasteTextField" layoutX="200" layoutY="489" prefWidth="200"/>
+    <Label layoutX="10" layoutY="524" text="Remarks"/>
+    <TextField fx:id="remarksTextField" layoutX="200" layoutY="519" prefWidth="200"/>
+</AnchorPane>

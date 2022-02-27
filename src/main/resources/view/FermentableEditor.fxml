@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?import javafx.scene.control.*?><?import javafx.scene.layout.*?><AnchorPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" prefHeight="1000" prefWidth="1000">
+    <Button fx:id="backButton" layoutX="10" layoutY="9" text="Back"/>
+    <Button fx:id="saveButton" layoutX="200" layoutY="9" text="Save"/>
+    <Label layoutX="10" layoutY="44" text="Id"/>
+    <TextField fx:id="idTextField" layoutX="200" layoutY="39" prefWidth="200"/>
+    <Label layoutX="10" layoutY="74" text="Colour"/>
+    <TextField fx:id="colourTextField" layoutX="200" layoutY="69" prefWidth="200"/>
+    <Label layoutX="10" layoutY="104" text="Fermentable Type"/>
+    <ComboBox fx:id="fermentableTypeComboBox" layoutX="200" layoutY="99" prefWidth="200"/>
+    <Label layoutX="10" layoutY="134" text="Moisture"/>
+    <TextField fx:id="moistureTextField" layoutX="200" layoutY="129" prefWidth="200"/>
+    <Label layoutX="10" layoutY="164" text="Name"/>
+    <TextField fx:id="nameTextField" layoutX="200" layoutY="159" prefWidth="200"/>
+    <Label layoutX="10" layoutY="194" text="Potential Extract"/>
+    <TextField fx:id="potentialExtractTextField" layoutX="200" layoutY="189" prefWidth="200"/>
+    <Label layoutX="10" layoutY="224" text="Yield"/>
+    <TextField fx:id="yieldTextField" layoutX="200" layoutY="219" prefWidth="200"/>
+    <Label layoutX="10" layoutY="254" text="Old Id"/>
+    <TextField fx:id="oldIdTextField" layoutX="200" layoutY="249" prefWidth="200"/>
+    <Label layoutX="10" layoutY="284" text="Maximum Percentage"/>
+    <TextField fx:id="maximumPercentageTextField" layoutX="200" layoutY="279" prefWidth="200"/>
+    <Label layoutX="10" layoutY="314" text="Protein"/>
+    <TextField fx:id="proteinTextField" layoutX="200" layoutY="309" prefWidth="200"/>
+    <Label layoutX="10" layoutY="344" text="Usage"/>
+    <TextField fx:id="usageTextField" layoutX="200" layoutY="339" prefWidth="200"/>
+    <Label layoutX="10" layoutY="374" text="Remarks"/>
+    <TextField fx:id="remarksTextField" layoutX="200" layoutY="369" prefWidth="200"/>
+</AnchorPane>

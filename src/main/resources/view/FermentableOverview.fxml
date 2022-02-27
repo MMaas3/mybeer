@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?import javafx.collections.FXCollections?><?import javafx.scene.control.cell.PropertyValueFactory?><?import javafx.scene.control.TableColumn?><?import javafx.scene.control.TableView?><?import javafx.scene.layout.BorderPane?><?import javafx.scene.layout.VBox?><?import javafx.scene.control.Button?><BorderPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.mybeer.view.FermentableOverviewController" prefHeight="1000" prefWidth="1000" style="-fx-padding: 10 10 10 10;">
+    <right>
+        <VBox spacing="10" style="-fx-padding: 0 0 0 10;">
+            <Button fx:id="openButton" text="Open Fermentable"/>
+            <Button fx:id="newButton" text="New Fermentable"/>
+            <Button fx:id="cloneButton" text="Clone Fermentable"/>
+            <Button fx:id="deleteButton" text="Delete Fermentable"/>
+        </VBox>
+    </right>
+    <center>
+        <TableView fx:id="tableView" layoutX="14" layoutY="30" prefWidth="500">
+            <columns>
+                <TableColumn>
+                    <cellValueFactory>
+                        <PropertyValueFactory property="name"/>
+                    </cellValueFactory>
+                </TableColumn>
+            </columns>
+            <items>
+                <FXCollections fx:factory="observableArrayList"/>
+            </items>
+        </TableView>
+    </center>
+</BorderPane>

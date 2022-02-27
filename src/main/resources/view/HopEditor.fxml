@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?import javafx.scene.control.*?><?import javafx.scene.layout.*?><AnchorPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" prefHeight="1000" prefWidth="1000">
+    <Button fx:id="backButton" layoutX="10" layoutY="9" text="Back"/>
+    <Button fx:id="saveButton" layoutX="200" layoutY="9" text="Save"/>
+    <Label layoutX="10" layoutY="44" text="Id"/>
+    <TextField fx:id="idTextField" layoutX="200" layoutY="39" prefWidth="200"/>
+    <Label layoutX="10" layoutY="74" text="Alpha Acid Percentage Min"/>
+    <TextField fx:id="alphaAcidPercentageMinTextField" layoutX="200" layoutY="69" prefWidth="200"/>
+    <Label layoutX="10" layoutY="104" text="Alpha Acid Percentage Max"/>
+    <TextField fx:id="alphaAcidPercentageMaxTextField" layoutX="200" layoutY="99" prefWidth="200"/>
+    <Label layoutX="10" layoutY="134" text="Beta Acid Percentage Min"/>
+    <TextField fx:id="betaAcidPercentageMinTextField" layoutX="200" layoutY="129" prefWidth="200"/>
+    <Label layoutX="10" layoutY="164" text="Beta Acid Percentage Max"/>
+    <TextField fx:id="betaAcidPercentageMaxTextField" layoutX="200" layoutY="159" prefWidth="200"/>
+    <Label layoutX="10" layoutY="194" text="Cohumulone Min"/>
+    <TextField fx:id="cohumuloneMinTextField" layoutX="200" layoutY="189" prefWidth="200"/>
+    <Label layoutX="10" layoutY="224" text="Cohumulone Max"/>
+    <TextField fx:id="cohumuloneMaxTextField" layoutX="200" layoutY="219" prefWidth="200"/>
+    <Label layoutX="10" layoutY="254" text="Oil Min"/>
+    <TextField fx:id="oilMinTextField" layoutX="200" layoutY="249" prefWidth="200"/>
+    <Label layoutX="10" layoutY="284" text="Oil Max"/>
+    <TextField fx:id="oilMaxTextField" layoutX="200" layoutY="279" prefWidth="200"/>
+    <Label layoutX="10" layoutY="314" text="Humulone Min"/>
+    <TextField fx:id="humuloneMinTextField" layoutX="200" layoutY="309" prefWidth="200"/>
+    <Label layoutX="10" layoutY="344" text="Humulone Max"/>
+    <TextField fx:id="humuloneMaxTextField" layoutX="200" layoutY="339" prefWidth="200"/>
+    <Label layoutX="10" layoutY="374" text="Caryophyllene Min"/>
+    <TextField fx:id="caryophylleneMinTextField" layoutX="200" layoutY="369" prefWidth="200"/>
+    <Label layoutX="10" layoutY="404" text="Caryophyllene Max"/>
+    <TextField fx:id="caryophylleneMaxTextField" layoutX="200" layoutY="399" prefWidth="200"/>
+    <Label layoutX="10" layoutY="434" text="Myrcene Min"/>
+    <TextField fx:id="myrceneMinTextField" layoutX="200" layoutY="429" prefWidth="200"/>
+    <Label layoutX="10" layoutY="464" text="Myrcene Max"/>
+    <TextField fx:id="myrceneMaxTextField" layoutX="200" layoutY="459" prefWidth="200"/>
+    <Label layoutX="10" layoutY="494" text="Farnesene Min"/>
+    <TextField fx:id="farneseneMinTextField" layoutX="200" layoutY="489" prefWidth="200"/>
+    <Label layoutX="10" layoutY="524" text="Farnesene Max"/>
+    <TextField fx:id="farneseneMaxTextField" layoutX="200" layoutY="519" prefWidth="200"/>
+    <Label layoutX="10" layoutY="554" text="Form"/>
+    <ComboBox fx:id="formComboBox" layoutX="200" layoutY="549" prefWidth="200"/>
+    <Label layoutX="10" layoutY="584" text="Name"/>
+    <TextField fx:id="nameTextField" layoutX="200" layoutY="579" prefWidth="200"/>
+    <Label layoutX="10" layoutY="614" text="Old Id"/>
+    <TextField fx:id="oldIdTextField" layoutX="200" layoutY="609" prefWidth="200"/>
+    <Label layoutX="10" layoutY="644" text="Alpha Beta Balance"/>
+    <TextField fx:id="alphaBetaBalanceTextField" layoutX="200" layoutY="639" prefWidth="200"/>
+    <Label layoutX="10" layoutY="674" text="Taste"/>
+    <TextField fx:id="tasteTextField" layoutX="200" layoutY="669" prefWidth="200"/>
+    <Label layoutX="10" layoutY="704" text="Substitute"/>
+    <TextField fx:id="substituteTextField" layoutX="200" layoutY="699" prefWidth="200"/>
+</AnchorPane>

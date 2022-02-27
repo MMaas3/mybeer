@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?import javafx.scene.control.*?><?import javafx.scene.layout.*?><AnchorPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" prefHeight="1000" prefWidth="1000">
+    <Button fx:id="backButton" layoutX="10" layoutY="9" text="Back"/>
+    <Button fx:id="saveButton" layoutX="200" layoutY="9" text="Save"/>
+    <Label layoutX="10" layoutY="44" text="Id"/>
+    <TextField fx:id="idTextField" layoutX="200" layoutY="39" prefWidth="200"/>
+    <Label layoutX="10" layoutY="74" text="Old Id"/>
+    <TextField fx:id="oldIdTextField" layoutX="200" layoutY="69" prefWidth="200"/>
+    <Label layoutX="10" layoutY="104" text="Name"/>
+    <TextField fx:id="nameTextField" layoutX="200" layoutY="99" prefWidth="200"/>
+    <Label layoutX="10" layoutY="134" text="Type"/>
+    <TextField fx:id="typeTextField" layoutX="200" layoutY="129" prefWidth="200"/>
+    <Label layoutX="10" layoutY="164" text="Gravity Addition"/>
+    <TextField fx:id="gravityAdditionTextField" layoutX="200" layoutY="159" prefWidth="200"/>
+    <Label layoutX="10" layoutY="194" text="Remark"/>
+    <TextField fx:id="remarkTextField" layoutX="200" layoutY="189" prefWidth="200"/>
+</AnchorPane>
