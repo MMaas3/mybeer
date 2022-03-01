@@ -1,6 +1,7 @@
 package org.mybeer.util;
 
 import org.mybeer.hibernate.GenericDao;
+import org.mybeer.model.BrewingSystem;
 import org.mybeer.model.ingredient.Fermentable;
 import org.mybeer.model.ingredient.Hop;
 import org.mybeer.model.ingredient.Spice;
@@ -26,6 +27,7 @@ public class SimpleOverviewGenerator {
     createOverview(Yeast.class, "name", "getName");
     createOverview(Spice.class, "name", "getName");
     createOverview(Recipe.class, "name", "getName");
+    createOverview(BrewingSystem.class, "name", "getName");
   }
 
   private static void createOverview(Class<?> type, String identityProperty, String identityPropertyGetter) throws Exception {

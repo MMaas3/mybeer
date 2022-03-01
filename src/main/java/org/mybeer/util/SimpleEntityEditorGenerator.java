@@ -1,5 +1,6 @@
 package org.mybeer.util;
 
+import org.mybeer.model.BrewingSystem;
 import org.mybeer.model.ingredient.Fermentable;
 import org.mybeer.model.ingredient.Hop;
 import org.mybeer.model.ingredient.Spice;
@@ -33,6 +34,7 @@ public class SimpleEntityEditorGenerator {
     createEditor(Hop.class);
     createEditor(Yeast.class);
     createEditor(Spice.class);
+    createEditor(BrewingSystem.class);
   }
 
   private static void createEditor(Class<?> type)

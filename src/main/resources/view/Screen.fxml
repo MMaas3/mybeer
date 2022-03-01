@@ -30,5 +30,10 @@
         <fx:include source="YeastOverview.fxml"/>
       </content>
     </Tab>
+    <Tab text="Brewing Systems">
+      <content>
+        <fx:include source="BrewingSystemOverview.fxml"/>
+      </content>
+    </Tab>
   </tabs>
 </TabPane>
