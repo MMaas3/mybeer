@@ -22,20 +22,22 @@ import java.io.FileWriter;
 
 public class SimpleOverviewGenerator {
   public static void main(String[] args) throws Exception {
-    createOverview(Fermentable.class, "name", "getName");
-    createOverview(Hop.class, "name", "getName");
-    createOverview(Yeast.class, "name", "getName");
-    createOverview(Spice.class, "name", "getName");
-    createOverview(Recipe.class, "name", "getName");
-    createOverview(BrewingSystem.class, "name", "getName");
+    createOverview(Fermentable.class, "name", "getName", false);
+    createOverview(Hop.class, "name", "getName", false);
+    createOverview(Yeast.class, "name", "getName", false);
+    createOverview(Spice.class, "name", "getName", false);
+    createOverview(Recipe.class, "name", "getId", true);
+    createOverview(BrewingSystem.class, "name", "getName", false);
   }
 
-  private static void createOverview(Class<?> type, String identityProperty, String identityPropertyGetter) throws Exception {
+  private static void createOverview(Class<?> type, String identityProperty, String identityPropertyGetter,
+                                     boolean reverseOrder) throws Exception {
     createFxml(type, identityProperty);
-    createController(type, identityPropertyGetter);
+    createController(type, identityPropertyGetter, reverseOrder);
   }
 
-  private static void createController(Class<?> type, String identityPropertyGetter) throws Exception {
+  private static void createController(Class<?> type, String identityPropertyGetter, boolean reverseOrder)
+      throws Exception {
     final StringBuilder stringBuilder = new StringBuilder("package org.mybeer.view;\n\n");
     stringBuilder.append("import javafx.collections.ObservableList;\n");
     stringBuilder.append("import javafx.fxml.FXML;\n");
@@ -69,7 +71,7 @@ public class SimpleOverviewGenerator {
     stringBuilder.append("  public void initialize() {\n");
     stringBuilder.append("    OverviewTableViewUtils.fillTableWithAllOfType(").append(simpleName)
                  .append(".class, tableView, Comparator.comparing(").append(simpleName).append("::")
-                 .append(identityPropertyGetter).append("));\n");
+                 .append(identityPropertyGetter).append(")").append(reverseOrder ? ".reversed()" : "").append(");\n");
     stringBuilder.append("    openButton.setOnAction(event -> {\n");
     stringBuilder.append("      final ObservableList<").append(simpleName)
                  .append("> selectedItems = tableView.getSelectionModel().getSelectedItems();\n");
@@ -136,7 +138,9 @@ public class SimpleOverviewGenerator {
     stringBuilder.append("        loader.setController(editorController);\n");
     stringBuilder.append("        final Parent root = loader.load();\n");
     stringBuilder.append("        stage.setScene(new Scene(root));\n");
-    stringBuilder.append("      } catch (IOException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {\n");
+    stringBuilder.append(
+        "      } catch (IOException | InstantiationException | InvocationTargetException | NoSuchMethodException | " +
+            "IllegalAccessException e) {\n");
     stringBuilder.append("        e.printStackTrace();\n");
     stringBuilder.append("      }\n");
     stringBuilder.append("    });\n");
