@@ -76,7 +76,7 @@ public class YeastEditorController {
       final Stage stage = (Stage) source.getScene().getWindow();
       try {
         final FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getClassLoader().getResource("view/YeastOverview.fxml"));
+        loader.setLocation(getClass().getClassLoader().getResource("view/Screen.fxml"));
         final Parent root = loader.load();
         stage.setScene(new Scene(root));
       } catch (IOException e) {

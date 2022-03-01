@@ -64,7 +64,7 @@ public class FermentableEditorController {
       final Stage stage = (Stage) source.getScene().getWindow();
       try {
         final FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getClassLoader().getResource("view/FermentableOverview.fxml"));
+        loader.setLocation(getClass().getClassLoader().getResource("view/Screen.fxml"));
         final Parent root = loader.load();
         stage.setScene(new Scene(root));
       } catch (IOException e) {

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<TabPane xmlns="http://javafx.com/javafx"
+         xmlns:fx="http://javafx.com/fxml">
+  <tabs>
+    <Tab text="Recipes">
+      <content>
+        <fx:include source="RecipeOverview.fxml"/>
+      </content>
+    </Tab>
+    <Tab text="Fermentables">
+      <content>
+        <fx:include source="FermentableOverview.fxml"/>
+      </content>
+    </Tab>
+    <Tab text="Hops">
+      <content>
+        <fx:include source="HopOverview.fxml"/>
+      </content>
+    </Tab>
+    <Tab text="Spices">
+      <content>
+        <fx:include source="SpiceOverview.fxml"/>
+      </content>
+    </Tab>
+    <Tab text="Yeasts">
+      <content>
+        <fx:include source="YeastOverview.fxml"/>
+      </content>
+    </Tab>
+  </tabs>
+</TabPane>

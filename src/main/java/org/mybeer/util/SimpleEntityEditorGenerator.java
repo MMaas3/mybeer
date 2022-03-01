@@ -35,7 +35,8 @@ public class SimpleEntityEditorGenerator {
     createEditor(Spice.class);
   }
 
-  private static void createEditor(Class<?> type) throws ParserConfigurationException, IOException, TransformerException {
+  private static void createEditor(Class<?> type)
+      throws ParserConfigurationException, IOException, TransformerException {
     createFxml(type);
     createController(type);
   }
@@ -103,7 +104,7 @@ public class SimpleEntityEditorGenerator {
     stringBuilder.append("      try {\n");
     stringBuilder.append("        final FXMLLoader loader = new FXMLLoader();\n");
     stringBuilder.append("        loader.setLocation(getClass().getClassLoader().getResource(\"view/")
-                 .append(simpleName).append("Overview.fxml\"));\n");
+                 .append("Screen.fxml\"));\n");
     stringBuilder.append("        final Parent root = loader.load();\n");
     stringBuilder.append("        stage.setScene(new Scene(root));\n");
     stringBuilder.append("      } catch (IOException e) {\n");
