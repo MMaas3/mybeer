@@ -23,4 +23,18 @@ public class RayDanielsBitternessMethodTest {
 
     assertEquals(BigDecimal.valueOf(3), actual.setScale(0, RoundingMode.HALF_UP));
   }
+
+  @Test
+  public void testBitternessCalculationAlsoUsesFirstWortForCalculation() {
+    final HopAddition hopAddition = new HopAddition();
+    hopAddition.setHopsAlphaAcid(BigDecimal.valueOf(8.5));
+    hopAddition.setAmount(BigDecimal.valueOf(7));
+    hopAddition.setContactTime(15);
+    hopAddition.setAdditionMoment(AdditionMoment.FIRST_WORT);
+    final RayDanielsBitternessMethod instance = new RayDanielsBitternessMethod();
+
+    final BigDecimal actual = instance.calculate(hopAddition, BigDecimal.valueOf(1.058), BigDecimal.valueOf(22));
+
+    assertEquals(BigDecimal.valueOf(3), actual.setScale(0, RoundingMode.HALF_UP));
+  }
 }

@@ -23,7 +23,7 @@ public class RayDanielsBitternessMethod implements BitternessCalculationMethod {
 
   private BigDecimal getUtilizationFactor(int contactTime, AdditionMoment additionMoment) {
 
-    if(additionMoment == AdditionMoment.BOIL) {
+    if(additionMoment == AdditionMoment.BOIL || additionMoment == AdditionMoment.FIRST_WORT) {
       if (contactTime >= 60) {
         return BigDecimal.valueOf(0.211);
       }
