@@ -4,8 +4,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -39,7 +37,6 @@ import org.mybeer.model.recipe.Recipe;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Optional;
 
 public class RecipeEditorController {
   @FXML
@@ -81,7 +78,7 @@ public class RecipeEditorController {
   private SimpleObjectProperty<BigDecimal> colourProp;
 
   public RecipeEditorController(Long id) {
-    try(final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
+    try (final Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       final Transaction transaction = session.beginTransaction();
       this.recipe = new RecipeDao().getById(session, id).orElseThrow();
       Hibernate.initialize(recipe.getFermentableAdditions());
@@ -134,7 +131,7 @@ public class RecipeEditorController {
 
   private void populateForm() {
     final SimpleStringProperty nameProp = new SimpleStringProperty(this.recipe.getName());
-    nameProp.addListener((observable, oldValue, newValue) -> {
+    nameField.textProperty().addListener((observable, oldValue, newValue) -> {
       recipe.setName(newValue);
     });
     nameField.textProperty().bindBidirectional(nameProp);
@@ -146,8 +143,13 @@ public class RecipeEditorController {
     final SimpleIntegerProperty boilTimeProp = new SimpleIntegerProperty(this.recipe.getBoilTime());
     final NumberStringConverter numberConverter = new NumberStringConverter();
     boilTimeField.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (newValue == null) {
+        newValue = "0";
+      }
       recipe.setBoilTime(numberConverter.fromString(newValue).intValue());
-      // totalWaterProp.setValue(calculateTotalWater(recipe));
+      if (totalWaterProp != null) {
+        totalWaterProp.setValue(calculateTotalWater(recipe));
+      }
     });
     boilTimeField.textProperty().bindBidirectional(boilTimeProp, numberConverter);
     final BigDecimalStringConverter bigDecimalConverter = new BigDecimalStringConverter();
@@ -167,7 +169,7 @@ public class RecipeEditorController {
         newValue = "0";
       }
       recipe.setVolume(bigDecimalConverter.fromString(newValue));
-      if(colourProp != null && gravityProp != null && totalWaterProp != null) {
+      if (colourProp != null && gravityProp != null && totalWaterProp != null) {
         colourProp.setValue(calculateColour(recipe));
         gravityProp.setValue(calculateGravity(recipe));
         totalWaterProp.setValue(calculateTotalWater(recipe));
