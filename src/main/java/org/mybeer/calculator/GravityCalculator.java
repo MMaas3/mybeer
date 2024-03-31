@@ -31,7 +31,7 @@ public class GravityCalculator {
   }
 
   private BigDecimal toKg(FermentableAddition addition) {
-    return addition.getAmount().divide(BigDecimal.valueOf(1000), MathContext.DECIMAL32);
+    return addition.getAmount() == null ? new BigDecimal(0) : addition.getAmount().divide(BigDecimal.valueOf(1000), MathContext.DECIMAL32);
   }
 
 }
