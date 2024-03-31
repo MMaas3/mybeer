@@ -35,5 +35,10 @@
         <fx:include source="BrewingSystemOverview.fxml"/>
       </content>
     </Tab>
+    <Tab text="Beer Style">
+      <content>
+        <fx:include source="BeerStyleOverview.fxml"/>
+      </content>
+    </Tab>
   </tabs>
 </TabPane>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?import javafx.scene.control.*?><?import javafx.scene.layout.*?><AnchorPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" prefHeight="1000" prefWidth="1000">
+    <Button fx:id="backButton" layoutX="10" layoutY="9" text="Back"/>
+    <Button fx:id="saveButton" layoutX="200" layoutY="9" text="Save"/>
+    <Label layoutX="10" layoutY="44" text="Id"/>
+    <TextField fx:id="idTextField" layoutX="200" layoutY="39" prefWidth="200"/>
+    <Label layoutX="10" layoutY="74" text="Beer Type"/>
+    <TextField fx:id="beerTypeTextField" layoutX="200" layoutY="69" prefWidth="200"/>
+    <Label layoutX="10" layoutY="104" text="Category"/>
+    <TextField fx:id="categoryTextField" layoutX="200" layoutY="99" prefWidth="200"/>
+    <Label layoutX="10" layoutY="134" text="Category Number"/>
+    <TextField fx:id="categoryNumberTextField" layoutX="200" layoutY="129" prefWidth="200"/>
+    <Label layoutX="10" layoutY="164" text="Name"/>
+    <TextField fx:id="nameTextField" layoutX="200" layoutY="159" prefWidth="200"/>
+    <Label layoutX="10" layoutY="194" text="Guide Name"/>
+    <TextField fx:id="guideNameTextField" layoutX="200" layoutY="189" prefWidth="200"/>
+    <Label layoutX="10" layoutY="224" text="Style Letter"/>
+    <TextField fx:id="styleLetterTextField" layoutX="200" layoutY="219" prefWidth="200"/>
+    <Label layoutX="10" layoutY="254" text="Minimum O G"/>
+    <TextField fx:id="minimumOGTextField" layoutX="200" layoutY="249" prefWidth="200"/>
+    <Label layoutX="10" layoutY="284" text="Maximum O G"/>
+    <TextField fx:id="maximumOGTextField" layoutX="200" layoutY="279" prefWidth="200"/>
+    <Label layoutX="10" layoutY="314" text="Minimum F G"/>
+    <TextField fx:id="minimumFGTextField" layoutX="200" layoutY="309" prefWidth="200"/>
+    <Label layoutX="10" layoutY="344" text="Maximum F G"/>
+    <TextField fx:id="maximumFGTextField" layoutX="200" layoutY="339" prefWidth="200"/>
+    <Label layoutX="10" layoutY="374" text="Minimum Alcohol By Volume"/>
+    <TextField fx:id="minimumAlcoholByVolumeTextField" layoutX="200" layoutY="369" prefWidth="200"/>
+    <Label layoutX="10" layoutY="404" text="Maximum Alcohol By Volume"/>
+    <TextField fx:id="maximumAlcoholByVolumeTextField" layoutX="200" layoutY="399" prefWidth="200"/>
+    <Label layoutX="10" layoutY="434" text="Minimum Bitterness"/>
+    <TextField fx:id="minimumBitternessTextField" layoutX="200" layoutY="429" prefWidth="200"/>
+    <Label layoutX="10" layoutY="464" text="Maximum Bitterness"/>
+    <TextField fx:id="maximumBitternessTextField" layoutX="200" layoutY="459" prefWidth="200"/>
+    <Label layoutX="10" layoutY="494" text="Minimum Carbonation"/>
+    <TextField fx:id="minimumCarbonationTextField" layoutX="200" layoutY="489" prefWidth="200"/>
+    <Label layoutX="10" layoutY="524" text="Maximum Carbonation"/>
+    <TextField fx:id="maximumCarbonationTextField" layoutX="200" layoutY="519" prefWidth="200"/>
+    <Label layoutX="10" layoutY="554" text="Minimum Colour"/>
+    <TextField fx:id="minimumColourTextField" layoutX="200" layoutY="549" prefWidth="200"/>
+    <Label layoutX="10" layoutY="584" text="Maximum Colour"/>
+    <TextField fx:id="maximumColourTextField" layoutX="200" layoutY="579" prefWidth="200"/>
+    <Label layoutX="10" layoutY="614" text="Ph Min"/>
+    <TextField fx:id="phMinTextField" layoutX="200" layoutY="609" prefWidth="200"/>
+    <Label layoutX="10" layoutY="644" text="Ph Max"/>
+    <TextField fx:id="phMaxTextField" layoutX="200" layoutY="639" prefWidth="200"/>
+</AnchorPane>
