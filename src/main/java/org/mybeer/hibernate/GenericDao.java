@@ -24,8 +24,7 @@ public class GenericDao<T> {
     try (Session session = SessionFactorySingleton.getSessionFactory().openSession()) {
       Transaction transaction = session.beginTransaction();
       T result = this.save(session, objectToSave);
-
-      session.flush();
+      
       transaction.commit();
 
       return result;
