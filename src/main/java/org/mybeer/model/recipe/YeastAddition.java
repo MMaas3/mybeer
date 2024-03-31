@@ -34,6 +34,18 @@ public class YeastAddition {
   private YeastAdditionType yeastAdditionType;
   private boolean amountWeight;
 
+  public YeastAddition() {
+
+  }
+
+  public YeastAddition(AdditionMoment additionMoment, BigDecimal amount, Yeast yeast, YeastAdditionType yeastAdditionType, boolean amountWeight) {
+    this.additionMoment = additionMoment;
+    this.amount = amount;
+    this.yeast = yeast;
+    this.yeastAdditionType = yeastAdditionType;
+    this.amountWeight = amountWeight;
+  }
+
   public AdditionMoment getAdditionMoment() {
     return additionMoment;
   }

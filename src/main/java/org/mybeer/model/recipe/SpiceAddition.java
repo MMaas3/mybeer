@@ -38,35 +38,35 @@ public class SpiceAddition {
     this.spiceMass = spiceMass;
   }
 
-  private Spice getSpice() {
+  public Spice getSpice() {
     return spice;
   }
 
-  private void setSpice(Spice spice) {
+  public void setSpice(Spice spice) {
     this.spice = spice;
   }
 
-  private AdditionMoment getAdditionMoment() {
+  public AdditionMoment getAdditionMoment() {
     return additionMoment;
   }
 
-  private void setAdditionMoment(AdditionMoment additionMoment) {
+  public void setAdditionMoment(AdditionMoment additionMoment) {
     this.additionMoment = additionMoment;
   }
 
-  private int getContactTime() {
+  public int getContactTime() {
     return contactTime;
   }
 
-  private void setContactTime(int contactTime) {
+  public void setContactTime(int contactTime) {
     this.contactTime = contactTime;
   }
 
-  private BigDecimal getSpiceMass() {
+  public BigDecimal getSpiceMass() {
     return spiceMass;
   }
 
-  private void setSpiceMass(BigDecimal spiceMass) {
+  public void setSpiceMass(BigDecimal spiceMass) {
     this.spiceMass = spiceMass;
   }
 }
