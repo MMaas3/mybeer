@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?import javafx.scene.control.*?><?import javafx.scene.layout.*?><AnchorPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" prefHeight="1000" prefWidth="1000">
+    <Button fx:id="backButton" layoutX="10" layoutY="9" text="Back"/>
+    <Button fx:id="saveButton" layoutX="200" layoutY="9" text="Save"/>
+    <Label layoutX="10" layoutY="44" text="Id"/>
+    <TextField fx:id="idTextField" layoutX="200" layoutY="39" prefWidth="200"/>
+    <Label layoutX="10" layoutY="74" text="Name"/>
+    <TextField fx:id="nameTextField" layoutX="200" layoutY="69" prefWidth="200"/>
+    <Label layoutX="10" layoutY="104" text="Mash Tun Volume"/>
+    <TextField fx:id="mashTunVolumeTextField" layoutX="200" layoutY="99" prefWidth="200"/>
+    <Label layoutX="10" layoutY="134" text="Mash Tun Height"/>
+    <TextField fx:id="mashTunHeightTextField" layoutX="200" layoutY="129" prefWidth="200"/>
+    <Label layoutX="10" layoutY="164" text="Copper Volume"/>
+    <TextField fx:id="copperVolumeTextField" layoutX="200" layoutY="159" prefWidth="200"/>
+    <Label layoutX="10" layoutY="194" text="Copper Height"/>
+    <TextField fx:id="copperHeightTextField" layoutX="200" layoutY="189" prefWidth="200"/>
+    <Label layoutX="10" layoutY="224" text="Hot Liquor Tank Volume"/>
+    <TextField fx:id="hotLiquorTankVolumeTextField" layoutX="200" layoutY="219" prefWidth="200"/>
+    <Label layoutX="10" layoutY="254" text="Hot Liquor Tank Height"/>
+    <TextField fx:id="hotLiquorTankHeightTextField" layoutX="200" layoutY="249" prefWidth="200"/>
+    <Label layoutX="10" layoutY="284" text="Water Loss Malt"/>
+    <TextField fx:id="waterLossMaltTextField" layoutX="200" layoutY="279" prefWidth="200"/>
+    <Label layoutX="10" layoutY="314" text="Evaporation Rate"/>
+    <TextField fx:id="evaporationRateTextField" layoutX="200" layoutY="309" prefWidth="200"/>
+    <Label layoutX="10" layoutY="344" text="Kettle Loss"/>
+    <TextField fx:id="kettleLossTextField" layoutX="200" layoutY="339" prefWidth="200"/>
+    <Label layoutX="10" layoutY="374" text="Yeast Loss"/>
+    <TextField fx:id="yeastLossTextField" layoutX="200" layoutY="369" prefWidth="200"/>
+    <Label layoutX="10" layoutY="404" text="Rest Loss"/>
+    <TextField fx:id="restLossTextField" layoutX="200" layoutY="399" prefWidth="200"/>
+    <Label layoutX="10" layoutY="434" text="Leaf Hop Loss"/>
+    <TextField fx:id="leafHopLossTextField" layoutX="200" layoutY="429" prefWidth="200"/>
+    <Label layoutX="10" layoutY="464" text="Pellet Hop Loss"/>
+    <TextField fx:id="pelletHopLossTextField" layoutX="200" layoutY="459" prefWidth="200"/>
+</AnchorPane>
